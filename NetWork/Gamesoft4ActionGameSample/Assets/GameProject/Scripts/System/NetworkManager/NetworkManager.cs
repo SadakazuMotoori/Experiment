@@ -14,6 +14,7 @@ namespace KdGame.Net
         private List<stPlayerData>  m_PlayerList;
         public const int NETWORK_TIME_OUT_WAIT = 10000; // タイムアウト時間(ms)
 
+        // コミットテスト
         // 受信データ
         private struct stReceiveData
         {
