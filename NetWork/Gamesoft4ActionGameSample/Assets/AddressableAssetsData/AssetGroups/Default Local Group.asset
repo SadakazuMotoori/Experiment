@@ -61,6 +61,10 @@ MonoBehaviour:
     m_Address: LobbyScene
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 70d9aee2c02954a4f9965d545f971d2d
+    m_Address: WaitRoomScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 6bc26bf05f216374eb4581d93bae3771, type: 2}
   m_SchemaSet:

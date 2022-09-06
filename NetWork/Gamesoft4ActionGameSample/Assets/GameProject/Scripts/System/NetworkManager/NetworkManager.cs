@@ -124,6 +124,18 @@ namespace KdGame.Net
             m_LastError             = ENETWORK_ERROR_CODE.ERR_NORE;
         }
 
+        public int GetMemberNum()
+        {
+            return PhotonNetwork.CountOfPlayers;
+        }
+
+        public string GetMemberName(int index = 0)
+        {
+            if (index >= m_PlayerList.Count) return "";
+
+            return m_PlayerList[index].name;
+        }
+
         public void SetPlayerName(string aPlayerName)
         {
             PhotonNetwork.LocalPlayer.NickName = aPlayerName;
@@ -189,6 +201,8 @@ namespace KdGame.Net
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
             {
                 m_PlayerList.Add(_playerData);
+
+                AppManager.Instance.ChangeScene("WaitRoomScene");
             }
             // クライアントなら自身のユーザーデータをマスターに送信して、リストを貰う
             else
