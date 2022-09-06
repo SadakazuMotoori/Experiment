@@ -41,6 +41,8 @@ namespace KdGame.Net
                     {
                         Debug.Log("PlayerName = " + m_PlayerList[i].name + " id = "+ m_PlayerList[i].id);
                     }
+
+                    AppManager.Instance.ChangeScene("WaitRoomScene");
                 }
                 break;
 

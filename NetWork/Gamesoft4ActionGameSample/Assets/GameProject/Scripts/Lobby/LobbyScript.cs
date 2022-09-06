@@ -37,4 +37,11 @@ public class LobbyScript : MonoBehaviour
 
         NetworkManager.Instance.InitializeNetworkStatus("TestRoom");
     }
+
+    public void OnClickJoinRoom()
+    {
+        Debug.Log("JoinRoom‰Ÿ‚³‚ê‚½!");  // ƒƒO‚ğo—Í
+
+        NetworkManager.Instance.InitializeNetworkStatus("TestRoom");
+    }
 }

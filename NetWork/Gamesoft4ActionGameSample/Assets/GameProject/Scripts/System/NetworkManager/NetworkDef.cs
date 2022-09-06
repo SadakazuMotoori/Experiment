@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using System;
 using Photon.Pun;
 
 namespace KdGame.Net
@@ -30,6 +31,7 @@ namespace KdGame.Net
         // ------------------------------------------------
 
         [MessagePackObject]
+        [Serializable]
         public struct stPlayerData
         {
             [Key(0)]

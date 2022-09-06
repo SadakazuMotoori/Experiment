@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 1037
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Console
   m_RootView: {fileID: 6}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 32
+  controlID: 111
 --- !u!114 &3
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 33
+  controlID: 77
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -248,7 +248,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 34
+  controlID: 78
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -318,22 +318,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/GameProject/Scenes
+    - Assets/GameProject/Scripts/System/NetworkManager
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 96
   m_LastFolders:
-  - Assets/GameProject/Scenes
+  - Assets/GameProject/Scripts/System/NetworkManager
   m_LastFoldersGridSize: 96
-  m_LastProjectPath: C:\Users\SadakazuMotoori\Desktop\Project\Unity\R&D\NetWork\Gamesoft4ActionGameSample
+  m_LastProjectPath: D:\Programs\Project\Unity\R&D\NetWork\Gamesoft4ActionGameSample
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 284}
-    m_SelectedIDs: 02830000
-    m_LastClickedID: 33538
-    m_ExpandedIDs: 00000000f8820000fa820000fc820000fe8200000083000002830000
+    scrollPos: {x: 0, y: 298.88348}
+    m_SelectedIDs: 40830000
+    m_LastClickedID: 33600
+    m_ExpandedIDs: 00000000028300000483000006830000088300000a8300000c8300000e830000108300001283000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -361,7 +361,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000f8820000fa820000fc820000fe8200000083000002830000
+    m_ExpandedIDs: 00000000028300000483000006830000088300000a8300000c8300000e8300001083000012830000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -386,8 +386,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 4abf0000
-    m_LastClickedInstanceID: 48970
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000
     m_RenameOverlay:
@@ -493,7 +493,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 4ed8feffbadefeff1ae2fefffce2feff26e9fefffeedfeffdaf1feff6002ffff741effff242bffff3e38ffffc841ffffbe4dffffea51ffff1655ffff1855ffff4497ffff2699ffffdcabfffffeaeffff9aafffff08b1ffff30b2ffff82beffff36c5fffff8c7ffff0ed3ffff2ed8ffff3ed9ffffc4ddffff52defffff6e4ffff14e6ffff8aecffff0cfbfffff4ffffff64ac0000b6ae000004b00000b0b20000aeb40000e8b400001cbb00004abf0000
+      m_ExpandedIDs: a26fffff1876ffff6e86ffffe48cffffbcb7ffffe4b7ffff5abeffff72caffffe8d0ffff88e4fffffeeaffff08fbffff0eb00000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -782,14 +782,14 @@ MonoBehaviour:
   m_OverrideSceneCullingMask: 6917529027641081856
   m_SceneIsLit: 1
   m_SceneLighting: 1
-  m_2DMode: 1
+  m_2DMode: 0
   m_isRotationLocked: 0
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 2.6121628, y: 0.15921645, z: -10.08821}
+    m_Target: {x: 0, y: 1, z: 90}
     speed: 2
-    m_Value: {x: 2.6121628, y: 0.15921645, z: -10.08821}
+    m_Value: {x: 0, y: 1, z: 90}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -818,17 +818,17 @@ MonoBehaviour:
       m_Size: {x: 0, y: 0}
     yGrid:
       m_Fade:
-        m_Target: 0
+        m_Target: 1
         speed: 2
-        m_Value: 0
+        m_Value: 1
       m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 0.4}
       m_Pivot: {x: 0, y: 0, z: 0}
       m_Size: {x: 1, y: 1}
     zGrid:
       m_Fade:
-        m_Target: 1
+        m_Target: 0
         speed: 2
-        m_Value: 1
+        m_Value: 0
       m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 0.4}
       m_Pivot: {x: 0, y: 0, z: 0}
       m_Size: {x: 1, y: 1}
@@ -836,17 +836,17 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0, y: 0, z: 0, w: 1}
+    m_Target: {x: 0.040798757, y: 0.0014944023, z: -0.000058463625, w: 0.99917066}
     speed: 2
-    m_Value: {x: 0, y: 0, z: 0, w: 1}
+    m_Value: {x: 0.04079858, y: 0.0014943957, z: -0.000058463367, w: 0.99916625}
   m_Size:
-    m_Target: 3.7256064
+    m_Target: 3.4168787
     speed: 2
-    m_Value: 3.7256064
+    m_Value: 3.4168787
   m_Ortho:
-    m_Target: 1
+    m_Target: 0
     speed: 2
-    m_Value: 1
+    m_Value: 0
   m_CameraSettings:
     m_Speed: 1
     m_SpeedNormalized: 0.5

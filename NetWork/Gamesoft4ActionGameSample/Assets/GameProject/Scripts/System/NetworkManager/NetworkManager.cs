@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using MessagePack;
+using MessagePack.Resolvers;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -38,6 +39,18 @@ namespace KdGame.Net
             Instance                = this;
             m_IsInitializedSystem   = false;
             m_IsInitializedNetwork  = false;
+
+            // シリアライザの初期設定
+            MessagePack.Resolvers.StaticCompositeResolver.Instance.Register(
+                MessagePack.Resolvers.GeneratedResolver.Instance, // コード生成した型解決クラス
+                MessagePack.Unity.UnityResolver.Instance,
+                MessagePack.Unity.Extension.UnityBlitWithPrimitiveArrayResolver.Instance,
+                MessagePack.Resolvers.StandardResolver.Instance
+            );
+            var option = MessagePack.MessagePackSerializerOptions.Standard
+                .WithCompression(MessagePack.MessagePackCompression.Lz4BlockArray) // LZ4 圧縮利用
+                .WithResolver(MessagePack.Resolvers.StaticCompositeResolver.Instance);
+            MessagePack.MessagePackSerializer.DefaultOptions = option;
         }
 
         void Start()
@@ -47,6 +60,7 @@ namespace KdGame.Net
         // Update is called once per frame
         void Update()
         {
+        //    Debug.Log("IsConnectedAndReady() = "+ IsConnectedAndReady());
             if (!IsConnectedAndReady() || m_NetworkCmdList.Count == 0) return;
 
             stReceiveData _data = m_NetworkCmdList.Dequeue();
@@ -97,6 +111,7 @@ namespace KdGame.Net
 
         private ENETWORK_ERROR_CODE CreateOrJoinDebugRoom()
         {
+            // マスターならルームを作成する
             if (PhotonNetwork.CountOfRooms == 0)
             {
                 if (!PhotonNetwork.CreateRoom("DEBUG ROOM", new RoomOptions(), TypedLobby.Default))
@@ -189,13 +204,16 @@ namespace KdGame.Net
 
             // 通信用ネットワークオブジェクトを作成
             m_View = this.gameObject.AddComponent<PhotonView>();
-            // VIEWIDを生成(今は決め打ち)
+            m_View.Synchronization = ViewSynchronization.Off;
+
+            // VIEWIDを生成
             m_View.ViewID = 1001;
+            //PhotonNetwork.AllocateViewID(m_View);
 
             // プレイヤーデータを作成する
-            stPlayerData _playerData = new stPlayerData();
-            _playerData.name    = PhotonNetwork.LocalPlayer.NickName;
-            _playerData.id      = PhotonNetwork.LocalPlayer.ActorNumber;
+            stPlayerData _playerData    = new stPlayerData();
+            _playerData.name            = PhotonNetwork.LocalPlayer.NickName;
+            _playerData.id              = m_View.ViewID;
 
             // マスターならユーザーデータを追加する
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
