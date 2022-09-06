@@ -52,7 +52,8 @@ namespace WindowSystem
 
                     await CloseWindow();
 
-                    await AppManager.Instance.ChangeScene("GameScene");
+                    await AppManager.Instance.ChangeScene("LobbyScene");
+ //                   await AppManager.Instance.ChangeScene("GameScene");
 
                     /*
                     // ƒV[ƒ“Ø‚è‘Ö‚¦

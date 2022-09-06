@@ -10,6 +10,8 @@ namespace KdGame.Net
 {
     public partial class NetworkManager : MonoBehaviourPunCallbacks
     {
+        public static NetworkManager Instance { get; private set; }
+
         private PhotonView          m_View;
         private List<stPlayerData>  m_PlayerList;
         public const int NETWORK_TIME_OUT_WAIT = 10000; // タイムアウト時間(ms)
@@ -22,7 +24,8 @@ namespace KdGame.Net
         }
         // ------------------------------------------------
 
-        private bool                    m_IsInitialized;
+        private bool                    m_IsInitializedSystem;
+        private bool                    m_IsInitializedNetwork;
         private ENETWORK_ERROR_CODE     m_LastError;
         private Queue<stReceiveData>    m_NetworkCmdList;
         // ------------------------------------------------
@@ -30,12 +33,11 @@ namespace KdGame.Net
         // Start is called before the first frame update
         void Awake()
         {
-            m_IsInitialized     = false;
-            m_NetworkCmdList    = new Queue<stReceiveData>();
-            m_NetworkCmdList.Clear();
+            if (Instance != null) return;
 
-            m_PlayerList        = new List<stPlayerData>();
-            m_LastError         = ENETWORK_ERROR_CODE.ERR_NORE;
+            Instance                = this;
+            m_IsInitializedSystem   = false;
+            m_IsInitializedNetwork  = false;
         }
 
         void Start()
@@ -54,7 +56,7 @@ namespace KdGame.Net
 
         private bool IsConnectedAndReady()
         {
-            return (m_IsInitialized && PhotonNetwork.IsConnectedAndReady && !PhotonNetwork.NetworkClientState.Equals(ClientState.JoiningLobby));
+            return (m_IsInitializedNetwork && PhotonNetwork.IsConnectedAndReady && !PhotonNetwork.NetworkClientState.Equals(ClientState.JoiningLobby));
         }
 
         private async UniTask NetworkWait()
@@ -112,6 +114,18 @@ namespace KdGame.Net
         }
         // ------------------------------------------------
 
+        public void InitializeNetworkManager()
+        {
+            if (m_IsInitializedSystem) return;
+
+            m_IsInitializedSystem   = true;
+            m_NetworkCmdList        = new Queue<stReceiveData>();
+            m_NetworkCmdList.Clear();
+
+            m_PlayerList            = new List<stPlayerData>();
+            m_LastError             = ENETWORK_ERROR_CODE.ERR_NORE;
+        }
+
         public ENETWORK_ERROR_CODE GetNetworkLastError()
         {
             return m_LastError;
@@ -119,7 +133,7 @@ namespace KdGame.Net
 
         public async UniTask InitializeNetworkStatus(string aName)
         {
-            if (m_IsInitialized) return;
+            if (m_IsInitializedNetwork) return;
 
             // ネットワーク初期化時にまずはサーバーへ接続
             if (!PhotonNetwork.IsConnected)
@@ -137,8 +151,8 @@ namespace KdGame.Net
         public override void OnConnectedToMaster()
         {
             Debug.Log("connected to master!");
-            
-            m_IsInitialized = true;
+
+            m_IsInitializedNetwork = true;
         }
 
         // ロビーに入室した

@@ -57,6 +57,10 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
+  - m_GUID: 96b5a59304fec3d499d92583030c2c9c
+    m_Address: LobbyScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 6bc26bf05f216374eb4581d93bae3771, type: 2}
   m_SchemaSet:

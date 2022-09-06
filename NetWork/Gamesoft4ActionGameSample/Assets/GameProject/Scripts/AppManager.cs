@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KdGame.Net;
 
 using Cysharp.Threading.Tasks;
 
 [DefaultExecutionOrder(-100)]
 public class AppManager : MonoBehaviour
 {
-
     /*
     // BeforeSceneLoadでAwakeより前に実行される
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -18,7 +18,7 @@ public class AppManager : MonoBehaviour
     */
 
     public static AppManager Instance { get; private set; }
-
+    
     void Awake()
     {
         if (Instance != null)
@@ -55,7 +55,6 @@ public class AppManager : MonoBehaviour
         //        await handle.Task;
         await AssetBundleManager.Instance.ChangeSceneAsync(key);
 
-
         // 使用していないアセットを解放
         await Resources.UnloadUnusedAssets();
         // GCのメモリ解放
@@ -64,5 +63,10 @@ public class AppManager : MonoBehaviour
         await UniTask.Delay(500);
 
         WindowSystem.WindowManager.Instance.ShowNowLoading(false);
+    }
+
+    public NetworkManager GetNetworkManager()
+    {
+        return NetworkManager.Instance;
     }
 }
