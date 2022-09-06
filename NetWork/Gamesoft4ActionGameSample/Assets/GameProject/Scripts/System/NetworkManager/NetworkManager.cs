@@ -72,8 +72,6 @@ namespace KdGame.Net
 
         private async UniTask<ENETWORK_ERROR_CODE> RequestConnect(string aName)
         {
-            PhotonNetwork.LocalPlayer.NickName = aName;
-
             // Photonサーバーへ接続する
             Debug.Log("Connect to master");
             if (!PhotonNetwork.ConnectUsingSettings())
@@ -126,6 +124,11 @@ namespace KdGame.Net
             m_LastError             = ENETWORK_ERROR_CODE.ERR_NORE;
         }
 
+        public void SetPlayerName(string aPlayerName)
+        {
+            PhotonNetwork.LocalPlayer.NickName = aPlayerName;
+        }
+
         public ENETWORK_ERROR_CODE GetNetworkLastError()
         {
             return m_LastError;
@@ -173,7 +176,7 @@ namespace KdGame.Net
             Debug.Log("joined room!!!");
 
             // 通信用ネットワークオブジェクトを作成
-            m_View = this.GetComponent<PhotonView>();
+            m_View = this.gameObject.AddComponent<PhotonView>();
             // VIEWIDを生成(今は決め打ち)
             m_View.ViewID = 1001;
 
