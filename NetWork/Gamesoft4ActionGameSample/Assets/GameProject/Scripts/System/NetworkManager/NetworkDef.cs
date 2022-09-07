@@ -27,6 +27,8 @@ namespace KdGame.Net
         {
             CMD_JOINROOM,                               // ルームジョイン通知
             CMD_UPDATEPLAYER_LIST,                      // プレイヤーリスト更新通知
+
+            CMD_GAMESTARTCOUNTDOWN,                     // ゲームスタートカウントダウン
             CMD_INPUT,                                  // キー入力通知
         }
         // ------------------------------------------------

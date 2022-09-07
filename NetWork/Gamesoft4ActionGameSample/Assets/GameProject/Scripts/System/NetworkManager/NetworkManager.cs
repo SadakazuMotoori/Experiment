@@ -15,6 +15,7 @@ namespace KdGame.Net
 
         private PhotonView          m_View;
         private List<stPlayerData>  m_PlayerList;
+        private long                m_VersatileCount;
         public const int NETWORK_TIME_OUT_WAIT = 10000; // タイムアウト時間(ms)
 
         // 受信データ
@@ -180,6 +181,25 @@ namespace KdGame.Net
             }
         }
 
+        public void GameStartNotification(long aStartTime)
+        {
+            m_VersatileCount = 0;
+            CreateSendData(ENETWORK_COMMAND.CMD_GAMESTARTCOUNTDOWN, RpcTarget.All, aStartTime);
+        }
+
+        public long GetVersatileCount()
+        {
+            return m_VersatileCount;
+        }
+        public void SetVersatileCount(long aCount)
+        {
+            m_VersatileCount = aCount;
+        }
+        public void ResetVersatileCount()
+        {
+            m_VersatileCount = 0;
+        }
+        
         // ------------------------------------------------
 
         // マスターサーバーへ接続した

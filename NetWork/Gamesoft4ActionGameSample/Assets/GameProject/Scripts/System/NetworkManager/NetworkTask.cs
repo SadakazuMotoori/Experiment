@@ -58,6 +58,13 @@ namespace KdGame.Net
                 break;
 
                 // 全員対象
+                case ENETWORK_COMMAND.CMD_GAMESTARTCOUNTDOWN:
+                {
+                    var _deserialized = MessagePackSerializer.Deserialize<long>(aData.data);
+                    SetVersatileCount(_deserialized);
+                }
+                break;
+
                 case ENETWORK_COMMAND.CMD_INPUT:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<string>(aData.data);

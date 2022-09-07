@@ -13,7 +13,6 @@ public class WaitingRoomScript : MonoBehaviour
     public Canvas   m_Canvas;
     private int     m_NowMemberCount = 0;
 
-    long            m_StartTime = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -49,7 +48,8 @@ public class WaitingRoomScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_StartTime == 0)
+        long _count = NetworkManager.Instance.GetVersatileCount();
+        if (_count == 0)
         {
             // ŽQ‰ÁŽÒˆê——
             int _memberNum = NetworkManager.Instance.GetMemberNum();
@@ -88,10 +88,11 @@ public class WaitingRoomScript : MonoBehaviour
         }
         else
         {
-            long time = (m_StartTime - (long)(DateTime.Now - UnixEpoch).TotalSeconds);
+            long time = (_count - (long)(DateTime.Now - UnixEpoch).TotalSeconds);
 
             if (time < 0)
             {
+                NetworkManager.Instance.ResetVersatileCount();
                 Destroy(this);
                 AppManager.Instance.ChangeScene("GameScene");
             }
@@ -123,6 +124,7 @@ public class WaitingRoomScript : MonoBehaviour
             }
         }
 
-        m_StartTime = (long)(DateTime.Now - UnixEpoch).TotalSeconds + 10;
+        long _startTime = (long)(DateTime.Now - UnixEpoch).TotalSeconds + 10;
+        NetworkManager.Instance.GameStartNotification(_startTime);
     }
 }
