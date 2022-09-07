@@ -1,10 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using MessagePack;
-using MessagePack.Resolvers;
+
 using Photon.Pun;
 using Photon.Realtime;
+
 using UnityEngine;
 
 namespace KdGame.Net
@@ -12,12 +11,12 @@ namespace KdGame.Net
     public partial class NetworkManager : MonoBehaviourPunCallbacks
     {
         public static NetworkManager Instance { get; private set; }
+        public const int NETWORK_TIME_OUT_WAIT = 10000; // タイムアウト時間(ms)
 
         private PhotonView          m_View;
-        private List<stPlayerData>  m_PlayerList;
+        private stPlayerInfo        m_PlayerInfo;
         private int                 m_MyID = 0;
         private long                m_VersatileCount;
-        public const int NETWORK_TIME_OUT_WAIT = 10000; // タイムアウト時間(ms)
 
         // 受信データ
         private struct stReceiveData
@@ -49,14 +48,17 @@ namespace KdGame.Net
                 MessagePack.Unity.Extension.UnityBlitWithPrimitiveArrayResolver.Instance,
                 MessagePack.Resolvers.StandardResolver.Instance
             );
+
+            // LZ4 圧縮利用
             var option = MessagePack.MessagePackSerializerOptions.Standard
-                .WithCompression(MessagePack.MessagePackCompression.Lz4BlockArray) // LZ4 圧縮利用
+                .WithCompression(MessagePack.MessagePackCompression.Lz4BlockArray)
                 .WithResolver(MessagePack.Resolvers.StaticCompositeResolver.Instance);
             MessagePack.MessagePackSerializer.DefaultOptions = option;
         }
 
         void Start()
         {
+            int a = 0;
         }
 
         // Update is called once per frame
@@ -137,32 +139,33 @@ namespace KdGame.Net
             m_NetworkCmdList        = new Queue<stReceiveData>();
             m_NetworkCmdList.Clear();
 
-            m_PlayerList            = new List<stPlayerData>();
+            m_PlayerInfo            = new stPlayerInfo();
+            m_PlayerInfo.playerlist = new List<stPlayerData>();
             m_LastError             = ENETWORK_ERROR_CODE.ERR_NORE;
         }
 
         public List<stPlayerData> GetPlayerList()
         {
-            return m_PlayerList;
+            return m_PlayerInfo.playerlist;
         }
 
         public int GetMemberNum()
         {
-            return m_PlayerList.Count;
+            return m_PlayerInfo.playerlist.Count;
         }
 
         public string GetMemberName(int index = 0)
         {
-            if (index >= m_PlayerList.Count) return "";
+            if (index >= m_PlayerInfo.playerlist.Count) return "";
 
-            return m_PlayerList[index].name;
+            return m_PlayerInfo.playerlist[index].playername;
         }
 
         public string GetMyName()
         {
-            if (m_MyID >= m_PlayerList.Count) return "";
+            if (m_MyID >= m_PlayerInfo.playerlist.Count) return "";
 
-            return m_PlayerList[m_MyID].name;
+            return m_PlayerInfo.playerlist[m_MyID].playername;
         }
 
         public void SetPlayerName(string aPlayerName)
@@ -237,34 +240,52 @@ namespace KdGame.Net
 
             // 通信用ネットワークオブジェクトを作成
             m_View = this.gameObject.AddComponent<PhotonView>();
-            m_View.Synchronization = ViewSynchronization.Off;
-
-            // VIEWIDを生成
-            m_View.ViewID = 1001;
+            m_View.Synchronization  = ViewSynchronization.Off;
             //PhotonNetwork.AllocateViewID(m_View);
+            m_View.ViewID           = 1001;
 
             // プレイヤーデータを作成する
             stPlayerData _playerData    = new stPlayerData();
-            _playerData.name            = PhotonNetwork.LocalPlayer.NickName;
-            _playerData.id              = PhotonNetwork.CountOfPlayers;
-            m_MyID                      = _playerData.id - 1;
+            _playerData.playername      = PhotonNetwork.LocalPlayer.NickName;
+            _playerData.playerid        = PhotonNetwork.CountOfPlayers;
+            m_MyID                      = _playerData.playerid - 1;
 
             // マスターならユーザーデータを追加する
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
             {
-                m_PlayerList.Add(_playerData);
+                m_PlayerInfo.playerlist.Add(_playerData);
 
                 AppManager.Instance.ChangeScene("WaitRoomScene");
             }
-            // クライアントなら自身のユーザーデータをマスターに送信して、リストを貰う
-            else
-            {
-                CreateSendData(ENETWORK_COMMAND.CMD_JOINROOM, RpcTarget.MasterClient, _playerData);
-            }
+        }
+
+        // ルームに誰かが入室した
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            base.OnPlayerEnteredRoom(newPlayer);
+
+            if (!PhotonNetwork.LocalPlayer.IsMasterClient) return;
+            stPlayerData _playerData    = new stPlayerData();
+            _playerData.playername      = newPlayer.NickName;
+            _playerData.playerid        = PhotonNetwork.CountOfPlayers - 1;
+
+            m_PlayerInfo.playerlist.Add(_playerData);
+
+            // 更新したプレイヤーリストを送信する
+            m_PlayerInfo.viewid         = m_View.ViewID;
+            CreateSendData(ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST, RpcTarget.Others, m_PlayerInfo);
+        }
+
+        // 誰かがルームから退室した
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            base.OnPlayerLeftRoom(otherPlayer);
+
+            if (!PhotonNetwork.LocalPlayer.IsMasterClient) return;
         }
         // ------------------------------------------------
 
-        [PunRPC]
+            [PunRPC]
         private void RpcSendMessage(ENETWORK_COMMAND aCMD , byte[] aData)
         {
             stReceiveData _receiveData = new stReceiveData

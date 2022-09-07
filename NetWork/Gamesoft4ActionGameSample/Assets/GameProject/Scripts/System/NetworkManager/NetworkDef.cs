@@ -25,30 +25,33 @@ namespace KdGame.Net
         // 受信コマンド解析定義
         public enum ENETWORK_COMMAND
         {
-            CMD_JOINROOM,                               // ルームジョイン通知
             CMD_UPDATEPLAYER_LIST,                      // プレイヤーリスト更新通知
 
             CMD_GAMESTARTCOUNTDOWN,                     // ゲームスタートカウントダウン
             CMD_INPUT,                                  // キー入力通知
         }
         // ------------------------------------------------
-
         [MessagePackObject]
         [Serializable]
         public struct stPlayerData
         {
             [Key(0)]
-            public string   name  { get; set; }
+            public string   playername                  { get; set; }
+
             [Key(1)]
-            public int      id    { get; set; }
+            public int      playerid                    { get; set; }
         }
+        // ------------------------------------------------
 
         [MessagePackObject]
         [Serializable]
         public struct stPlayerInfo
         {
             [Key(0)]
-            public List<stPlayerData> list { get; set; }
+            public int                  viewid          { get; set; }
+
+            [Key(1)]
+            public List<stPlayerData>   playerlist      { get; set; }
         }
     }
 }

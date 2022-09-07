@@ -20,39 +20,18 @@ namespace KdGame.Net
         {
             switch (aData.cmd)
             {
-                // マスタークライアント限定
-                case ENETWORK_COMMAND.CMD_JOINROOM:
-                {
-                    var _deserialized = MessagePackSerializer.Deserialize<stPlayerData>(aData.data);
-                    m_PlayerList.Add(_deserialized);
-
-                    CreateSendData(ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST, RpcTarget.Others, 0);
-                }
-                break;
-
                 // クライアント限定
                 case ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST:
                 {
-                    m_PlayerList.Clear();
-                    int index = 0;
-                    foreach(var player in PhotonNetwork.PlayerList)
+                    var _deserialized = MessagePackSerializer.Deserialize<stPlayerInfo>(aData.data);
+                    m_PlayerInfo.playerlist.Clear();
+                    m_PlayerInfo.playerlist = _deserialized.playerlist;
+                    m_View.ViewID           = _deserialized.viewid;
+                    for (short i = 0; i < m_PlayerInfo.playerlist.Count; i++)
                     {
-                        stPlayerData _player = new stPlayerData();
-                        _player.name    = player.NickName;
-                        _player.id      = index++;
-
-                        m_PlayerList.Add(_player);
+                        Debug.Log("PlayerName = " + m_PlayerInfo.playerlist[i].playername + " id = "+ m_PlayerInfo.playerlist[i].playerid);
                     }
-/*
-                    var _deserialized = MessagePackSerializer.Deserialize<List<stPlayerData>>(aData.data);
-                    m_PlayerList.Clear();
-                    m_PlayerList = _deserialized;
 
-                    for(short i = 0; i < m_PlayerList.Count; i++)
-                    {
-                        Debug.Log("PlayerName = " + m_PlayerList[i].name + " id = "+ m_PlayerList[i].id);
-                    }
-*/
                     AppManager.Instance.ChangeScene("WaitRoomScene");
                 }
                 break;

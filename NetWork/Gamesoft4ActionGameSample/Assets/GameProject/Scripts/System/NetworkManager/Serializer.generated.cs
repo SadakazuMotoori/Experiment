@@ -47,9 +47,11 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(1)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(3)
             {
-                { typeof(global::KdGame.Net.NetworkManager.stPlayerData), 0 },
+                { typeof(global::System.Collections.Generic.List<global::KdGame.Net.NetworkManager.stPlayerData>), 0 },
+                { typeof(global::KdGame.Net.NetworkManager.stPlayerData), 1 },
+                { typeof(global::KdGame.Net.NetworkManager.stPlayerInfo), 2 },
             };
         }
 
@@ -63,7 +65,9 @@ namespace MessagePack.Resolvers
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerDataFormatter();
+                case 0: return new global::MessagePack.Formatters.ListFormatter<global::KdGame.Net.NetworkManager.stPlayerData>();
+                case 1: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerDataFormatter();
+                case 2: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerInfoFormatter();
                 default: return null;
             }
         }
@@ -106,8 +110,8 @@ namespace MessagePack.Formatters.KdGame.Net
         {
             global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
             writer.WriteArrayHeader(2);
-            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.name, options);
-            writer.Write(value.id);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.playername, options);
+            writer.Write(value.playerid);
         }
 
         public global::KdGame.Net.NetworkManager.stPlayerData Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
@@ -127,10 +131,54 @@ namespace MessagePack.Formatters.KdGame.Net
                 switch (i)
                 {
                     case 0:
-                        ____result.name = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
+                        ____result.playername = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     case 1:
-                        ____result.id = reader.ReadInt32();
+                        ____result.playerid = reader.ReadInt32();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
+    public sealed class NetworkManager_stPlayerInfoFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stPlayerInfo>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stPlayerInfo value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(2);
+            writer.Write(value.viewid);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<global::KdGame.Net.NetworkManager.stPlayerData>>(formatterResolver).Serialize(ref writer, value.playerlist, options);
+        }
+
+        public global::KdGame.Net.NetworkManager.stPlayerInfo Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::KdGame.Net.NetworkManager.stPlayerInfo();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.viewid = reader.ReadInt32();
+                        break;
+                    case 1:
+                        ____result.playerlist = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<global::KdGame.Net.NetworkManager.stPlayerData>>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     default:
                         reader.Skip();
