@@ -139,9 +139,14 @@ namespace KdGame.Net
             m_LastError             = ENETWORK_ERROR_CODE.ERR_NORE;
         }
 
+        public List<stPlayerData> GetPlayerList()
+        {
+            return m_PlayerList;
+        }
+
         public int GetMemberNum()
         {
-            return PhotonNetwork.CountOfPlayers;
+            return m_PlayerList.Count;
         }
 
         public string GetMemberName(int index = 0)
@@ -213,7 +218,7 @@ namespace KdGame.Net
             // プレイヤーデータを作成する
             stPlayerData _playerData    = new stPlayerData();
             _playerData.name            = PhotonNetwork.LocalPlayer.NickName;
-            _playerData.id              = m_View.ViewID;
+            _playerData.id              = PhotonNetwork.CountOfPlayers;
 
             // マスターならユーザーデータを追加する
             if (PhotonNetwork.LocalPlayer.IsMasterClient)

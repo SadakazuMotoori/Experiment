@@ -6,6 +6,7 @@ using TMPro;
 
 public class LobbyScript : MonoBehaviour
 {
+    public Canvas m_Canvas;
     TMP_InputField m_InputField;
 
     // Start is called before the first frame update
@@ -35,12 +36,28 @@ public class LobbyScript : MonoBehaviour
     {
         Debug.Log("CreateRoom押された!");  // ログを出力
 
+        foreach (Transform child in m_Canvas.transform)
+        {
+            if (child.name == "Button01" || child.name == "Button02")
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
         NetworkManager.Instance.InitializeNetworkStatus("TestRoom");
     }
 
     public void OnClickJoinRoom()
     {
         Debug.Log("JoinRoom押された!");  // ログを出力
+
+        foreach (Transform child in m_Canvas.transform)
+        {
+            if (child.name == "Button01" || child.name == "Button02")
+            {
+                Destroy(child.gameObject);
+            }
+        }
 
         NetworkManager.Instance.InitializeNetworkStatus("TestRoom");
     }

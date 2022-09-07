@@ -26,13 +26,24 @@ namespace KdGame.Net
                     var _deserialized = MessagePackSerializer.Deserialize<stPlayerData>(aData.data);
                     m_PlayerList.Add(_deserialized);
 
-                    CreateSendData(ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST, RpcTarget.Others, m_PlayerList);
+                    CreateSendData(ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST, RpcTarget.Others, 0);
                 }
                 break;
 
                 // クライアント限定
                 case ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST:
                 {
+                    m_PlayerList.Clear();
+                    int index = 0;
+                    foreach(var player in PhotonNetwork.PlayerList)
+                    {
+                        stPlayerData _player = new stPlayerData();
+                        _player.name    = player.NickName;
+                        _player.id      = index++;
+
+                        m_PlayerList.Add(_player);
+                    }
+/*
                     var _deserialized = MessagePackSerializer.Deserialize<List<stPlayerData>>(aData.data);
                     m_PlayerList.Clear();
                     m_PlayerList = _deserialized;
@@ -41,7 +52,7 @@ namespace KdGame.Net
                     {
                         Debug.Log("PlayerName = " + m_PlayerList[i].name + " id = "+ m_PlayerList[i].id);
                     }
-
+*/
                     AppManager.Instance.ChangeScene("WaitRoomScene");
                 }
                 break;

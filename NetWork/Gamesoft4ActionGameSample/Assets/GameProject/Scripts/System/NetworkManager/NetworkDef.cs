@@ -1,5 +1,6 @@
 ﻿using MessagePack;
 using System;
+using System.Collections.Generic;
 using Photon.Pun;
 
 namespace KdGame.Net
@@ -38,6 +39,14 @@ namespace KdGame.Net
             public string   name  { get; set; }
             [Key(1)]
             public int      id    { get; set; }
+        }
+
+        [MessagePackObject]
+        [Serializable]
+        public struct stPlayerInfo
+        {
+            [Key(0)]
+            public List<stPlayerData> list { get; set; }
         }
     }
 }
