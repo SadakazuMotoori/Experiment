@@ -15,6 +15,7 @@ namespace KdGame.Net
 
         private PhotonView          m_View;
         private List<stPlayerData>  m_PlayerList;
+        private int                 m_MyID = 0;
         private long                m_VersatileCount;
         public const int NETWORK_TIME_OUT_WAIT = 10000; // タイムアウト時間(ms)
 
@@ -157,6 +158,13 @@ namespace KdGame.Net
             return m_PlayerList[index].name;
         }
 
+        public string GetMyName()
+        {
+            if (m_MyID >= m_PlayerList.Count) return "";
+
+            return m_PlayerList[m_MyID].name;
+        }
+
         public void SetPlayerName(string aPlayerName)
         {
             PhotonNetwork.LocalPlayer.NickName = aPlayerName;
@@ -239,6 +247,7 @@ namespace KdGame.Net
             stPlayerData _playerData    = new stPlayerData();
             _playerData.name            = PhotonNetwork.LocalPlayer.NickName;
             _playerData.id              = PhotonNetwork.CountOfPlayers;
+            m_MyID                      = _playerData.id - 1;
 
             // マスターならユーザーデータを追加する
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
