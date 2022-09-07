@@ -4,8 +4,16 @@ using UnityEngine;
 
 public class MainObjectParameter : MonoBehaviour
 {
+    // プレイヤーID
+    [SerializeField] public int _playerID = 0;
+    public int PlayerID
+    {
+        get { return _playerID; }
+        set { _playerID = value; }
+    }
+
     // チームID
-    [SerializeField] int _teamID = 0;
+    [SerializeField] public int _teamID = 0;
     public int TeamID
     {
         get { return _teamID; }
@@ -13,12 +21,12 @@ public class MainObjectParameter : MonoBehaviour
     }
 
     // 名前
-    [SerializeField] string _name;
+    [SerializeField] public string _name;
     public string Name => _name;
 
 
     // 体力
-    [SerializeField] int _hp = 0;
+    [SerializeField] public int _hp = 0;
     public int Hp
     {
         get => _hp;

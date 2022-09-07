@@ -47,11 +47,13 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(3)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(5)
             {
                 { typeof(global::System.Collections.Generic.List<global::KdGame.Net.NetworkManager.stPlayerData>), 0 },
-                { typeof(global::KdGame.Net.NetworkManager.stPlayerData), 1 },
-                { typeof(global::KdGame.Net.NetworkManager.stPlayerInfo), 2 },
+                { typeof(global::KdGame.Net.NetworkManager.stCreateCharacterParameter), 1 },
+                { typeof(global::KdGame.Net.NetworkManager.stNetworkParameter), 2 },
+                { typeof(global::KdGame.Net.NetworkManager.stPlayerData), 3 },
+                { typeof(global::KdGame.Net.NetworkManager.stPlayerInfo), 4 },
             };
         }
 
@@ -66,8 +68,10 @@ namespace MessagePack.Resolvers
             switch (key)
             {
                 case 0: return new global::MessagePack.Formatters.ListFormatter<global::KdGame.Net.NetworkManager.stPlayerData>();
-                case 1: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerDataFormatter();
-                case 2: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerInfoFormatter();
+                case 1: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stCreateCharacterParameterFormatter();
+                case 2: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stNetworkParameterFormatter();
+                case 3: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerDataFormatter();
+                case 4: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerInfoFormatter();
                 default: return null;
             }
         }
@@ -103,6 +107,114 @@ namespace MessagePack.Resolvers
 
 namespace MessagePack.Formatters.KdGame.Net
 {
+    public sealed class NetworkManager_stCreateCharacterParameterFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stCreateCharacterParameter>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stCreateCharacterParameter value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(5);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.pos, options);
+            writer.Write(value.playerid);
+            writer.Write(value.teamid);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.name, options);
+            writer.Write(value.hp);
+        }
+
+        public global::KdGame.Net.NetworkManager.stCreateCharacterParameter Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::KdGame.Net.NetworkManager.stCreateCharacterParameter();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.pos = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        ____result.playerid = reader.ReadInt32();
+                        break;
+                    case 2:
+                        ____result.teamid = reader.ReadInt32();
+                        break;
+                    case 3:
+                        ____result.name = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 4:
+                        ____result.hp = reader.ReadInt32();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
+    public sealed class NetworkManager_stNetworkParameterFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stNetworkParameter>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stNetworkParameter value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(4);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector2>(formatterResolver).Serialize(ref writer, value.axis, options);
+            writer.Write(value.attack);
+            writer.Write(value.isgrounded);
+            writer.Write(value.isdied);
+        }
+
+        public global::KdGame.Net.NetworkManager.stNetworkParameter Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::KdGame.Net.NetworkManager.stNetworkParameter();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.axis = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector2>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        ____result.attack = reader.ReadBoolean();
+                        break;
+                    case 2:
+                        ____result.isgrounded = reader.ReadBoolean();
+                        break;
+                    case 3:
+                        ____result.isdied = reader.ReadBoolean();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
     public sealed class NetworkManager_stPlayerDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stPlayerData>
     {
 

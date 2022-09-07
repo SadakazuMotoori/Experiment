@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Photon.Pun;
 
+using UnityEngine;
 namespace KdGame.Net
 {
     public partial class NetworkManager : MonoBehaviourPunCallbacks
@@ -28,6 +29,7 @@ namespace KdGame.Net
             CMD_UPDATEPLAYER_LIST,                      // プレイヤーリスト更新通知
 
             CMD_GAMESTARTCOUNTDOWN,                     // ゲームスタートカウントダウン
+            CMD_CREATECHARACTER,                        // キャラクター生成
             CMD_INPUT,                                  // キー入力通知
         }
         // ------------------------------------------------
@@ -52,6 +54,47 @@ namespace KdGame.Net
 
             [Key(1)]
             public List<stPlayerData>   playerlist      { get; set; }
+        }
+
+        [MessagePackObject]
+        [Serializable]
+        public struct stCreateCharacterParameter
+        {
+            [Key(0)]
+            public Vector3  pos { get; set; }
+
+            // プレイヤーID
+            [Key(1)]
+            public int      playerid { get; set; }
+
+            // チームID
+            [Key(2)]
+            public int      teamid { get; set; }
+
+            // 名前
+            [Key(3)]
+            public string   name { get; set; }
+
+            // 体力
+            [Key(4)]
+            public int      hp { get; set; }
+        }
+
+        [MessagePackObject]
+        [Serializable]
+        public struct stNetworkParameter
+        {
+            [Key(0)]
+            public Vector2 axis { get; set; }
+
+            [Key(1)]
+            public bool attack { get; set; }
+
+            [Key(2)]
+            public bool isgrounded { get; set; }
+
+            [Key(3)]
+            public bool isdied { get; set; }
         }
     }
 }

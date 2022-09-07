@@ -168,6 +168,18 @@ namespace KdGame.Net
             return m_PlayerInfo.playerlist[m_MyID].playername;
         }
 
+        public int GetMyID()
+        {
+            return m_MyID;
+        }
+
+        public string GetMyName(int aIndex)
+        {
+            if (m_MyID >= m_PlayerInfo.playerlist.Count) return "";
+
+            return m_PlayerInfo.playerlist[aIndex].playername;
+        }
+
         public void SetPlayerName(string aPlayerName)
         {
             PhotonNetwork.LocalPlayer.NickName = aPlayerName;
@@ -285,7 +297,7 @@ namespace KdGame.Net
         }
         // ------------------------------------------------
 
-            [PunRPC]
+        [PunRPC]
         private void RpcSendMessage(ENETWORK_COMMAND aCMD , byte[] aData)
         {
             stReceiveData _receiveData = new stReceiveData

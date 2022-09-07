@@ -44,6 +44,13 @@ namespace KdGame.Net
                 }
                 break;
 
+                case ENETWORK_COMMAND.CMD_CREATECHARACTER:
+                {
+                    var _deserialized = MessagePackSerializer.Deserialize<stCreateCharacterParameter>(aData.data);
+                    GameSceneManager.Instance.OnCreateCharacter(_deserialized);
+                }
+                break;
+
                 case ENETWORK_COMMAND.CMD_INPUT:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<string>(aData.data);

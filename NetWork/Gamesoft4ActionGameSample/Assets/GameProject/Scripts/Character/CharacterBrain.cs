@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks.Triggers;
 
 using StandardAssets.Characters.Physics;
 
+using KdGame.Net;
 namespace Character
 {
     [RequireComponent(typeof(MainObjectParameter))]
@@ -351,6 +352,8 @@ namespace Character
 
             public override void OnUpdate()
             {
+                if (_brain._mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
+
                 Vector2 axis = _brain._inputProvider.GetAxisL();
 
                 if (axis.magnitude < 0.01f)
@@ -387,6 +390,52 @@ namespace Character
 
                 // Ž€–S”»’è
                 if (_brain._mainObjParam.IsDied)
+                {
+                    Animator.SetTrigger("DoDied");
+                    return;
+                }
+            }
+
+            public void OnNetworkUpdate(Vector2 aAxis, bool aGetButtonAttack,bool aIsGrounded,  bool aIsDied)
+            {
+                if (_brain._mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
+
+                Vector2 axis = aAxis;
+
+                if (axis.magnitude < 0.01f)
+                {
+                    Animator.SetBool("IsMoving", false);
+                    return;
+                }
+
+                // –€ŽC
+                if (aIsGrounded)
+                {
+                    //                    _brain.ApplyFriction(0.00001f);
+                    _brain._friction = 0.85f;
+                }
+                else
+                {
+                    _brain._friction = 0.98f;
+                }
+
+                // d—Í
+                _brain._gravity = -9.8f;
+
+                // ˆÚ“®
+                if (aIsGrounded)
+                {
+                    _brain.Walk(axis, true);
+                }
+
+                if (aGetButtonAttack)
+                {
+                    Animator.SetTrigger("DoAttack");
+                    return;
+                }
+
+                // Ž€–S”»’è
+                if (aIsDied)
                 {
                     Animator.SetTrigger("DoDied");
                     return;

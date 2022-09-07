@@ -6,8 +6,13 @@ using UnityEngine.AddressableAssets;
 
 using Cysharp.Threading.Tasks;
 
+using KdGame.Net;
+using Photon.Pun;
+
 public class GameSceneManager : MonoBehaviour
 {
+    public static GameSceneManager Instance { get; private set; }
+
     [SerializeField] Character.CharacterBrain _playerChara;
 
     float _time;
@@ -40,11 +45,30 @@ public class GameSceneManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        if (Instance != null) return;
+
+        Instance = this;
     }
 
     void Start()
     {
         _time = Time.time;
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // プレイヤー分キャラを作成する
+            for (short i = 0; i < NetworkManager.Instance.GetMemberNum(); i++)
+            {
+                NetworkManager.stCreateCharacterParameter _createCharParam = new NetworkManager.stCreateCharacterParameter();
+                _createCharParam.pos        = new Vector3(Random.Range(-2, 2), 0, Random.Range(-2, 2));
+                _createCharParam.name       = NetworkManager.Instance.GetMyName(i);
+                _createCharParam.teamid     = 0;
+                _createCharParam.hp         = 100;
+                _createCharParam.playerid   = i;
+
+                NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_CREATECHARACTER, RpcTarget.All, _createCharParam);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -53,11 +77,10 @@ public class GameSceneManager : MonoBehaviour
         if(Time.time - _time > 1.0f)
         {
             _time = Time.time;
-
         }
     }
 
-    public async void OnCreateCharacter()
+    public async void OnCreateCharacter(NetworkManager.stCreateCharacterParameter aCreateCharParam)
     {
         /*
         var handle = Addressables.LoadAssetAsync<GameObject>("Character");
@@ -66,16 +89,16 @@ public class GameSceneManager : MonoBehaviour
         GameObject newObj = Instantiate(asset);
         */
 
-        float x = Random.Range(-5, 5);
-        float z = Random.Range(-5, 5);
+        var handle = Addressables.InstantiateAsync("UnityChan", position: aCreateCharParam.pos, rotation: Quaternion.identity, parent: transform);
 
-        var handle = Addressables.InstantiateAsync("UnityChan_Enemy", position: new Vector3(x,0,z), rotation: Quaternion.identity, parent: transform);
-
-        //        GameObject newObj = handle.WaitForCompletion();
+//      GameObject newObj = handle.WaitForCompletion();
         GameObject newObj = await handle.Task;
-        newObj.GetComponent<MainObjectParameter>().TeamID = 0;
+        newObj.GetComponent<MainObjectParameter>()._name        = aCreateCharParam.name;
+        newObj.GetComponent<MainObjectParameter>()._hp          = aCreateCharParam.hp;
+        newObj.GetComponent<MainObjectParameter>()._playerID    = aCreateCharParam.playerid;
+        newObj.GetComponent<MainObjectParameter>()._teamID      = aCreateCharParam.teamid;
 
-//        newObj.transform.position = new Vector3(x, 0, 0);
+//      newObj.transform.position = new Vector3(x, 0, 0);
     }
 
     public async void OnCreateEnemy()
