@@ -51,6 +51,13 @@ namespace KdGame.Net
                 }
                 break;
 
+                case ENETWORK_COMMAND.CMD_CHARACTERUPDATE:
+                {
+                    var _deserialized = MessagePackSerializer.Deserialize<stNetworkParameter>(aData.data);
+                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).OnNetworkUpdate(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
+                }
+                break;
+
                 case ENETWORK_COMMAND.CMD_INPUT:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<string>(aData.data);

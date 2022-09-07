@@ -30,6 +30,7 @@ namespace KdGame.Net
 
             CMD_GAMESTARTCOUNTDOWN,                     // ゲームスタートカウントダウン
             CMD_CREATECHARACTER,                        // キャラクター生成
+            CMD_CHARACTERUPDATE,                        // キャラクター同期
             CMD_INPUT,                                  // キー入力通知
         }
         // ------------------------------------------------
@@ -84,16 +85,20 @@ namespace KdGame.Net
         [Serializable]
         public struct stNetworkParameter
         {
+            // プレイヤーID
             [Key(0)]
-            public Vector2 axis { get; set; }
+            public int playerid { get; set; }
 
             [Key(1)]
-            public bool attack { get; set; }
+            public Vector2 axis { get; set; }
 
             [Key(2)]
-            public bool isgrounded { get; set; }
+            public bool attack { get; set; }
 
             [Key(3)]
+            public bool isgrounded { get; set; }
+
+            [Key(4)]
             public bool isdied { get; set; }
         }
     }

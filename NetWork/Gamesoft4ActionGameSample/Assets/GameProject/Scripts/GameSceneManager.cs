@@ -17,6 +17,8 @@ public class GameSceneManager : MonoBehaviour
 
     float _time;
 
+    List<Character.CharacterBrain> _characterList;
+
     public async UniTask GameClear()
     {
         _playerChara.DoWin();
@@ -48,6 +50,8 @@ public class GameSceneManager : MonoBehaviour
         if (Instance != null) return;
 
         Instance = this;
+
+        _characterList = new List<Character.CharacterBrain>();
     }
 
     void Start()
@@ -98,6 +102,7 @@ public class GameSceneManager : MonoBehaviour
         newObj.GetComponent<MainObjectParameter>()._playerID    = aCreateCharParam.playerid;
         newObj.GetComponent<MainObjectParameter>()._teamID      = aCreateCharParam.teamid;
 
+        _characterList.Add(newObj.GetComponent<Character.CharacterBrain>());
 //      newObj.transform.position = new Vector3(x, 0, 0);
     }
 
@@ -116,4 +121,8 @@ public class GameSceneManager : MonoBehaviour
         Addressables.LoadSceneAsync("Lesson01_Addressables");
     }
 
+    public Character.CharacterBrain GetCharacterBrain(int aIndex)
+    {
+        return _characterList[aIndex];
+    }
 }

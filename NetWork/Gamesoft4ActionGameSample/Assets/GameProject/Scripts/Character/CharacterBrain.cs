@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks.Triggers;
 using StandardAssets.Characters.Physics;
 
 using KdGame.Net;
+using Photon.Pun;
 namespace Character
 {
     [RequireComponent(typeof(MainObjectParameter))]
@@ -70,6 +71,8 @@ namespace Character
         }
         public NowStateTypes NowStateType { get; private set; }
 
+        NetworkManager.stNetworkParameter NetParam;
+
         void Awake()
         {
             _mainObjParam = GetComponent<MainObjectParameter>();
@@ -81,8 +84,8 @@ namespace Character
             //        _input = GetComponent<PlayerInput>();
 
             // これをしていないと、gameObjectを有効/無効にしたときにステートマシンがリセットされていろいろまずい
-//            _animator.keepAnimatorControllerStateOnDisable = true;
-//            _stateMgr = _animator.GetComponent<GameStateMachine.StateMachineManager>();
+            //            _animator.keepAnimatorControllerStateOnDisable = true;
+            //            _stateMgr = _animator.GetComponent<GameStateMachine.StateMachineManager>();
 
             /*
             // Animatorの全ステート設定
@@ -92,6 +95,8 @@ namespace Character
                 smb.GetStateNode<ASBase>().Initialize(this);
             }
             */
+
+            NetParam = new NetworkManager.stNetworkParameter();
         }
 
         // Start is called before the first frame update
@@ -206,6 +211,52 @@ namespace Character
             _velocity.x += forward.x * Time.deltaTime;
             _velocity.z += forward.z * Time.deltaTime;
 
+        }
+
+        public void OnNetworkUpdate(Vector2 aAxis, bool aGetButtonAttack, bool aIsGrounded, bool aIsDied)
+        {
+            if (_mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
+
+            Vector2 axis = aAxis;
+
+            if (axis.magnitude < 0.01f)
+            {
+                _stateMgr.Animator.SetBool("IsMoving", false);
+                return;
+            }
+
+            // 摩擦
+            if (aIsGrounded)
+            {
+                //                    _brain.ApplyFriction(0.00001f);
+                _friction = 0.85f;
+            }
+            else
+            {
+                _friction = 0.98f;
+            }
+
+            // 重力
+            _gravity = -9.8f;
+
+            // 移動
+            if (aIsGrounded)
+            {
+                Walk(axis, true);
+            }
+
+            if (aGetButtonAttack)
+            {
+                _stateMgr.Animator.SetTrigger("DoAttack");
+                return;
+            }
+
+            // 死亡判定
+            if (aIsDied)
+            {
+                _stateMgr.Animator.SetTrigger("DoDied");
+                return;
+            }
         }
 
         /// <summary>
@@ -354,7 +405,12 @@ namespace Character
             {
                 if (_brain._mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
 
-                Vector2 axis = _brain._inputProvider.GetAxisL();
+                Vector2 axis                = _brain._inputProvider.GetAxisL();
+                _brain.NetParam.playerid    = NetworkManager.Instance.GetMyID();
+                _brain.NetParam.axis        = axis;
+                _brain.NetParam.isgrounded  = _brain._charaCtrl.isGrounded;
+                _brain.NetParam.isdied      = _brain._mainObjParam.IsDied;
+                NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_CHARACTERUPDATE, RpcTarget.Others, _brain.NetParam);
 
                 if (axis.magnitude < 0.01f)
                 {
@@ -390,52 +446,6 @@ namespace Character
 
                 // 死亡判定
                 if (_brain._mainObjParam.IsDied)
-                {
-                    Animator.SetTrigger("DoDied");
-                    return;
-                }
-            }
-
-            public void OnNetworkUpdate(Vector2 aAxis, bool aGetButtonAttack,bool aIsGrounded,  bool aIsDied)
-            {
-                if (_brain._mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
-
-                Vector2 axis = aAxis;
-
-                if (axis.magnitude < 0.01f)
-                {
-                    Animator.SetBool("IsMoving", false);
-                    return;
-                }
-
-                // 摩擦
-                if (aIsGrounded)
-                {
-                    //                    _brain.ApplyFriction(0.00001f);
-                    _brain._friction = 0.85f;
-                }
-                else
-                {
-                    _brain._friction = 0.98f;
-                }
-
-                // 重力
-                _brain._gravity = -9.8f;
-
-                // 移動
-                if (aIsGrounded)
-                {
-                    _brain.Walk(axis, true);
-                }
-
-                if (aGetButtonAttack)
-                {
-                    Animator.SetTrigger("DoAttack");
-                    return;
-                }
-
-                // 死亡判定
-                if (aIsDied)
                 {
                     Animator.SetTrigger("DoDied");
                     return;
