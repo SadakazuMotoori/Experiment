@@ -47,15 +47,16 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(7)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(8)
             {
                 { typeof(global::System.Collections.Generic.List<global::KdGame.Net.NetworkManager.stPlayerData>), 0 },
                 { typeof(global::KdGame.Net.NetworkManager.stCreateCharacterParameter), 1 },
                 { typeof(global::KdGame.Net.NetworkManager.stNetworkParameter), 2 },
                 { typeof(global::KdGame.Net.NetworkManager.stPlayerData), 3 },
                 { typeof(global::KdGame.Net.NetworkManager.stPlayerInfo), 4 },
-                { typeof(global::KdGame.Net.NetworkManager.stSyncKey), 5 },
-                { typeof(global::KdGame.Net.NetworkManager.stSyncPos), 6 },
+                { typeof(global::KdGame.Net.NetworkManager.stSyncAttack), 5 },
+                { typeof(global::KdGame.Net.NetworkManager.stSyncKey), 6 },
+                { typeof(global::KdGame.Net.NetworkManager.stSyncPos), 7 },
             };
         }
 
@@ -74,8 +75,9 @@ namespace MessagePack.Resolvers
                 case 2: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stNetworkParameterFormatter();
                 case 3: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerDataFormatter();
                 case 4: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerInfoFormatter();
-                case 5: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stSyncKeyFormatter();
-                case 6: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stSyncPosFormatter();
+                case 5: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stSyncAttackFormatter();
+                case 6: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stSyncKeyFormatter();
+                case 7: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stSyncPosFormatter();
                 default: return null;
             }
         }
@@ -311,6 +313,48 @@ namespace MessagePack.Formatters.KdGame.Net
         }
     }
 
+    public sealed class NetworkManager_stSyncAttackFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stSyncAttack>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stSyncAttack value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            writer.WriteArrayHeader(2);
+            writer.Write(value.playerid);
+            writer.Write(value.attack);
+        }
+
+        public global::KdGame.Net.NetworkManager.stSyncAttack Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
+            }
+
+            options.Security.DepthStep(ref reader);
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::KdGame.Net.NetworkManager.stSyncAttack();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.playerid = reader.ReadInt32();
+                        break;
+                    case 1:
+                        ____result.attack = reader.ReadBoolean();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
     public sealed class NetworkManager_stSyncKeyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stSyncKey>
     {
 
@@ -361,8 +405,9 @@ namespace MessagePack.Formatters.KdGame.Net
         public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stSyncPos value, global::MessagePack.MessagePackSerializerOptions options)
         {
             global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(2);
+            writer.WriteArrayHeader(3);
             writer.Write(value.playerid);
+            writer.Write(value.hp);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.pos, options);
         }
 
@@ -386,6 +431,9 @@ namespace MessagePack.Formatters.KdGame.Net
                         ____result.playerid = reader.ReadInt32();
                         break;
                     case 1:
+                        ____result.hp = reader.ReadInt32();
+                        break;
+                    case 2:
                         ____result.pos = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     default:

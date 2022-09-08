@@ -35,6 +35,8 @@ namespace KdGame.Net
 
             CMD_SYNCPOS,                                // 位置同期
             CMD_SYNCKEY,                                // キー同期
+            CMD_SYNCATTACK,                             // 攻撃同期
+            CMD_SYNCDEAD,                               // 戦闘不能同期
             CMD_INPUT,                                  // キー入力通知
         }
         // ------------------------------------------------
@@ -115,6 +117,9 @@ namespace KdGame.Net
             public int playerid { get; set; }
 
             [Key(1)]
+            public int hp { get; set; }
+
+            [Key(2)]
             public Vector3 pos  { get; set; }
         }
 
@@ -128,6 +133,18 @@ namespace KdGame.Net
 
             [Key(1)]
             public Vector2 key { get; set; }
+        }
+
+        [MessagePackObject]
+        [Serializable]
+        public struct stSyncAttack
+        {
+            // プレイヤーID
+            [Key(0)]
+            public int playerid { get; set; }
+
+            [Key(1)]
+            public bool attack { get; set; }
         }
     }
 }

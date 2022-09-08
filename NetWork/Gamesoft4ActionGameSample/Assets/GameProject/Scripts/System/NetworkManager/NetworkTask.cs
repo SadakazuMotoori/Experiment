@@ -27,10 +27,6 @@ namespace KdGame.Net
                     m_PlayerInfo.playerlist.Clear();
                     m_PlayerInfo.playerlist = _deserialized.playerlist;
                     m_View.ViewID           = _deserialized.viewid;
-                    for (short i = 0; i < m_PlayerInfo.playerlist.Count; i++)
-                    {
-                        Debug.Log("PlayerName = " + m_PlayerInfo.playerlist[i].playername + " id = "+ m_PlayerInfo.playerlist[i].playerid);
-                    }
 
                     AppManager.Instance.ChangeScene("WaitRoomScene");
                 }
@@ -54,7 +50,12 @@ namespace KdGame.Net
                 case ENETWORK_COMMAND.CMD_CHARACTEMOVE:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<stNetworkParameter>(aData.data);
-                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).SetMove(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
+
+                    Character.CharacterBrain _brain = GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid);
+                    if (_brain)
+                    {
+                        _brain.SetMove(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
+                    }
                 //  OnNetworkUpdate(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
                 }
                 break;
@@ -69,14 +70,47 @@ namespace KdGame.Net
                 case ENETWORK_COMMAND.CMD_SYNCPOS:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<stSyncPos>(aData.data);
-                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).SetSyncPos(_deserialized.pos);
+                    
+                    Character.CharacterBrain _brain = GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid);
+                    if (_brain)
+                    {
+                        _brain.SetSyncPosAndHP(_deserialized.pos, _deserialized.hp);
+                    }
                 }
                 break;
 
                 case ENETWORK_COMMAND.CMD_SYNCKEY:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<stSyncKey>(aData.data);
-                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).SetSyncKey(_deserialized.key);
+
+                    Character.CharacterBrain _brain = GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid);
+                    if (_brain)
+                    {
+                        _brain.SetSyncKey(_deserialized.key);
+                    }
+                }
+                break;
+
+                case ENETWORK_COMMAND.CMD_SYNCATTACK:
+                {
+                    var _deserialized = MessagePackSerializer.Deserialize<stSyncAttack>(aData.data);
+
+                    Character.CharacterBrain _brain = GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid);
+                    if (_brain)
+                    {
+                        _brain.SetSyncAttack(_deserialized.attack);
+                    }
+                }
+                break;
+
+                case ENETWORK_COMMAND.CMD_SYNCDEAD:
+                {
+                    var _deserialized = MessagePackSerializer.Deserialize<int>(aData.data);
+                    Character.CharacterBrain _brain = GameSceneManager.Instance.GetCharacterBrain(_deserialized);
+                    if (_brain)
+                    {
+                        _brain.SetSyncDead(true);
+                    }
                 }
                 break;
             }

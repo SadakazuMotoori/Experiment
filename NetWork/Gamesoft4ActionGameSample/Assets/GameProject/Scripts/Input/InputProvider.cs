@@ -13,4 +13,5 @@ public class InputProvider : MonoBehaviour
     public virtual Vector2 GetAxisR() => Vector2.zero;
 
     public virtual bool GetButtonAttack() => false;
+    public virtual void SetButtonAttack(bool attack) { }
 }

@@ -64,9 +64,12 @@ public class GameSceneManager : MonoBehaviour
             for (short i = 0; i < NetworkManager.Instance.GetMemberNum(); i++)
             {
                 NetworkManager.stCreateCharacterParameter _createCharParam = new NetworkManager.stCreateCharacterParameter();
-                _createCharParam.pos        = new Vector3(Random.Range(-2, 2), 0, Random.Range(-2, 2));
+
+                string posName = "StartPos" + i;
+                Vector3 pos = GameObject.Find(posName).transform.position;
+                _createCharParam.pos        = new Vector3(pos.x, pos.y, pos.y);
                 _createCharParam.name       = NetworkManager.Instance.GetPlayerName(i);
-                _createCharParam.teamid     = 0;
+                _createCharParam.teamid     = i;
                 _createCharParam.hp         = 100;
                 _createCharParam.playerid   = i;
 
@@ -92,17 +95,20 @@ public class GameSceneManager : MonoBehaviour
 
         GameObject newObj = Instantiate(asset);
         */
-
-        var handle = Addressables.InstantiateAsync("UnityChanDotNet", position: aCreateCharParam.pos, rotation: Quaternion.identity, parent: transform);
+        string posName = "StartPos" + aCreateCharParam.playerid;
+        Vector3 pos = GameObject.Find(posName).transform.position;
+        var handle = Addressables.InstantiateAsync("UnityChanDotNet", position: pos, rotation: Quaternion.identity, parent: transform);
 
 //      GameObject newObj = handle.WaitForCompletion();
         GameObject newObj = await handle.Task;
         newObj.GetComponent<MainObjectParameter>()._name        = aCreateCharParam.name;
         newObj.GetComponent<MainObjectParameter>()._hp          = aCreateCharParam.hp;
         newObj.GetComponent<MainObjectParameter>()._playerID    = aCreateCharParam.playerid;
-        newObj.GetComponent<MainObjectParameter>()._teamID      = aCreateCharParam.teamid;
-
-        _characterList.Add(newObj.GetComponent<Character.CharacterBrain>());
+        newObj.GetComponent<MainObjectParameter>()._teamID      = aCreateCharParam.playerid;
+  
+        Character.CharacterBrain _brain = newObj.GetComponent<Character.CharacterBrain>();
+        _brain.SetPlayerID(aCreateCharParam.playerid);
+        _characterList.Add(_brain);
 //      newObj.transform.position = new Vector3(x, 0, 0);
     }
 
@@ -123,6 +129,8 @@ public class GameSceneManager : MonoBehaviour
 
     public Character.CharacterBrain GetCharacterBrain(int aIndex)
     {
+        if (aIndex >= _characterList.Count) return null;
+
         return _characterList[aIndex];
     }
 }

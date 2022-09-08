@@ -9,10 +9,11 @@ using KdGame.Net;
 using Photon.Pun;
 public class NetworkInputProvider : InputProvider
 {
-    Vector2 m_Key       = Vector2.zero;
-    Vector2 m_PrevKey   = Vector2.zero;
+    Vector2 m_Key           = Vector2.zero;
+    bool    m_Attack        = false;
+    bool    m_PrevAttack    = false;
 
-    int     m_PlayerID  = -1;
+    int m_PlayerID  = -1;
 
     public override void SetPlayerID(int ID) { m_PlayerID = ID; }
 
@@ -21,7 +22,7 @@ public class NetworkInputProvider : InputProvider
     {
         //        return PlayerInputManager.Instance.Input.currentActionMap["AxisL"].ReadValue<Vector2>();
 
-        Vector2 axis = (m_PlayerID == NetworkManager.Instance.GetMyID()) ? m_Key : Vector2.zero;
+        Vector2 axis = m_Key;
         Quaternion r = Quaternion.Euler(0, 0, -Camera.main.transform.eulerAngles.y);
         return r * axis;
     }
@@ -37,27 +38,42 @@ public class NetworkInputProvider : InputProvider
 
     public override bool GetButtonAttack()
     {
-        return PlayerInputManager.Instance.GamePlay_GetButtonAttack();
+        return m_Attack;
+    }
+    public override void SetButtonAttack(bool attack)
+    {
+        m_Attack = attack;
     }
 
     private void Update()
     {
-        if (PlayerInputManager.Instance.GamePlay_GetButtonMenu())
-        {
-            OpenMenuWindow().Forget();
-        }
-
         if (m_PlayerID == NetworkManager.Instance.GetMyID())
         {
-            if (m_PrevKey != PlayerInputManager.Instance.GamePlay_GetAxisL())
+            if (PlayerInputManager.Instance.GamePlay_GetButtonMenu())
             {
-                m_Key       = PlayerInputManager.Instance.GamePlay_GetAxisL();
-                m_PrevKey   = m_Key;
+                OpenMenuWindow().Forget();
+            }
+
+            if (m_Key != PlayerInputManager.Instance.GamePlay_GetAxisL())
+            {
+                m_Key = PlayerInputManager.Instance.GamePlay_GetAxisL();
 
                 NetworkManager.stSyncKey syncKeyInfo = new NetworkManager.stSyncKey();
                 syncKeyInfo.playerid    = NetworkManager.Instance.GetMyID();
-                syncKeyInfo.key         = m_PrevKey;
+                syncKeyInfo.key         = m_Key;
                 NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCKEY, RpcTarget.All, syncKeyInfo);
+            }
+
+            m_Attack = PlayerInputManager.Instance.GamePlay_GetButtonAttack();
+            if (m_Attack != m_PrevAttack)
+            {
+                m_Attack = PlayerInputManager.Instance.GamePlay_GetButtonAttack();
+
+                NetworkManager.stSyncAttack syncAttackInfo = new NetworkManager.stSyncAttack();
+                syncAttackInfo.playerid     = NetworkManager.Instance.GetMyID();
+                syncAttackInfo.attack       = m_Attack;
+                m_PrevAttack                = m_Attack;
+                NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCATTACK, RpcTarget.All, syncAttackInfo);
             }
         }
     }

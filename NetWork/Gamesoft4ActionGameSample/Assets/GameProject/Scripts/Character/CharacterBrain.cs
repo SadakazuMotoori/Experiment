@@ -82,7 +82,6 @@ namespace Character
             _inputProvider = GetComponentInChildren<InputProvider>();
             Debug.Assert(_inputProvider != null, "InputProviderがセットされてない！");
 
-            _inputProvider.SetPlayerID(_mainObjParam._playerID);
             //        _input = GetComponent<PlayerInput>();
 
             // これをしていないと、gameObjectを有効/無効にしたときにステートマシンがリセットされていろいろまずい
@@ -152,8 +151,9 @@ namespace Character
                     _brain.NetParam.isdied = _brain._mainObjParam.IsDied;
 */
                     NetworkManager.stSyncPos syncPosInfo = new NetworkManager.stSyncPos();
-                    syncPosInfo.playerid = NetworkManager.Instance.GetMyID();
-                    syncPosInfo.pos = gameObject.transform.position;
+                    syncPosInfo.playerid    = NetworkManager.Instance.GetMyID();
+                    syncPosInfo.pos         = gameObject.transform.position;
+                    syncPosInfo.hp          = _mainObjParam.Hp;
                     NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCPOS, RpcTarget.Others, syncPosInfo);
 
                     timeElapsed = 0.0f;
@@ -236,14 +236,30 @@ namespace Character
             _velocity.z += forward.z * Time.deltaTime;
 
         }
-        public void SetSyncPos(Vector3 pos)
+        public void SetSyncPosAndHP(Vector3 pos, int hp)
         {
-            gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, pos, Time.deltaTime);
+            gameObject.transform.position   = Vector3.Lerp(gameObject.transform.position, pos, 0.33f);
+            _mainObjParam.Hp                = hp;
         }
 
         public void SetSyncKey(Vector2 key)
         {
             _inputProvider.SetAxisL(key);
+        }
+
+        public void SetSyncAttack(bool attack)
+        {
+            _inputProvider.SetButtonAttack(attack);
+        }
+
+        public void SetSyncDead(bool dead)
+        {
+            _mainObjParam.IsDied = dead;
+        }
+
+        public void SetPlayerID(int id)
+        {
+            _inputProvider.SetPlayerID(id);
         }
 
         public void SetMove(Vector2 aAxis, bool aGetButtonAttack, bool aIsGrounded, bool aIsDied)
@@ -309,10 +325,16 @@ namespace Character
             if (_mainObjParam.IsInvincible) return false;
 
             // 
-            _mainObjParam.Hp -= param.DamageValue;
+            if (_mainObjParam._playerID == NetworkManager.Instance.GetMyID())
+            {
+                _mainObjParam.Hp -= param.DamageValue;
+            }
             if (_mainObjParam.Hp <= 0)
             {
-                _mainObjParam.IsDied = true;
+                if (_mainObjParam._playerID == NetworkManager.Instance.GetMyID())
+                {
+                    NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCDEAD, RpcTarget.All, NetworkManager.Instance.GetMyID());
+                }
             }
             else
             {

@@ -21,7 +21,6 @@ public class StageObjectBrain : MonoBehaviour, Attack.IDamageApplicable
         return true;
     }
 
-
     void Awake()
     {
         TryGetComponent(out _mainObjParam);

@@ -15,7 +15,7 @@ namespace KdGame.Net
 
         private PhotonView          m_View;
         private stPlayerInfo        m_PlayerInfo;
-        private int                 m_MyID = 0;
+        private int                 m_MyID = -1;
         private long                m_VersatileCount;
 
         // 受信データ
@@ -257,8 +257,8 @@ namespace KdGame.Net
             // プレイヤーデータを作成する
             stPlayerData _playerData    = new stPlayerData();
             _playerData.playername      = PhotonNetwork.LocalPlayer.NickName;
-            _playerData.playerid        = PhotonNetwork.CountOfPlayers - 1;
-            m_MyID                      = _playerData.playerid;
+            _playerData.playerid        = m_PlayerInfo.playerlist.Count;
+            m_MyID                      = PhotonNetwork.CountOfPlayers-1;
 
             // マスターならユーザーデータを追加する
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
