@@ -31,6 +31,10 @@ namespace KdGame.Net
             CMD_GAMESTARTCOUNTDOWN,                     // ゲームスタートカウントダウン
             CMD_CREATECHARACTER,                        // キャラクター生成
             CMD_CHARACTERUPDATE,                        // キャラクター同期
+            CMD_CHARACTEMOVE,                           // キャラクター移動
+
+            CMD_SYNCPOS,                                // 位置同期
+            CMD_SYNCKEY,                                // キー同期
             CMD_INPUT,                                  // キー入力通知
         }
         // ------------------------------------------------
@@ -100,6 +104,30 @@ namespace KdGame.Net
 
             [Key(4)]
             public bool isdied { get; set; }
+        }
+
+        [MessagePackObject]
+        [Serializable]
+        public struct stSyncPos
+        {
+            // プレイヤーID
+            [Key(0)]
+            public int playerid { get; set; }
+
+            [Key(1)]
+            public Vector3 pos  { get; set; }
+        }
+
+        [MessagePackObject]
+        [Serializable]
+        public struct stSyncKey
+        {
+            // プレイヤーID
+            [Key(0)]
+            public int playerid { get; set; }
+
+            [Key(1)]
+            public Vector2 key { get; set; }
         }
     }
 }

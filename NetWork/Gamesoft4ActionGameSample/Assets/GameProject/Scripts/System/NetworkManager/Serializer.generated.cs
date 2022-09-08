@@ -47,13 +47,15 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(5)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(7)
             {
                 { typeof(global::System.Collections.Generic.List<global::KdGame.Net.NetworkManager.stPlayerData>), 0 },
                 { typeof(global::KdGame.Net.NetworkManager.stCreateCharacterParameter), 1 },
                 { typeof(global::KdGame.Net.NetworkManager.stNetworkParameter), 2 },
                 { typeof(global::KdGame.Net.NetworkManager.stPlayerData), 3 },
                 { typeof(global::KdGame.Net.NetworkManager.stPlayerInfo), 4 },
+                { typeof(global::KdGame.Net.NetworkManager.stSyncKey), 5 },
+                { typeof(global::KdGame.Net.NetworkManager.stSyncPos), 6 },
             };
         }
 
@@ -72,6 +74,8 @@ namespace MessagePack.Resolvers
                 case 2: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stNetworkParameterFormatter();
                 case 3: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerDataFormatter();
                 case 4: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stPlayerInfoFormatter();
+                case 5: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stSyncKeyFormatter();
+                case 6: return new MessagePack.Formatters.KdGame.Net.NetworkManager_stSyncPosFormatter();
                 default: return null;
             }
         }
@@ -169,7 +173,8 @@ namespace MessagePack.Formatters.KdGame.Net
         public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stNetworkParameter value, global::MessagePack.MessagePackSerializerOptions options)
         {
             global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(4);
+            writer.WriteArrayHeader(5);
+            writer.Write(value.playerid);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector2>(formatterResolver).Serialize(ref writer, value.axis, options);
             writer.Write(value.attack);
             writer.Write(value.isgrounded);
@@ -193,15 +198,18 @@ namespace MessagePack.Formatters.KdGame.Net
                 switch (i)
                 {
                     case 0:
-                        ____result.axis = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector2>(formatterResolver).Deserialize(ref reader, options);
+                        ____result.playerid = reader.ReadInt32();
                         break;
                     case 1:
-                        ____result.attack = reader.ReadBoolean();
+                        ____result.axis = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector2>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     case 2:
-                        ____result.isgrounded = reader.ReadBoolean();
+                        ____result.attack = reader.ReadBoolean();
                         break;
                     case 3:
+                        ____result.isgrounded = reader.ReadBoolean();
+                        break;
+                    case 4:
                         ____result.isdied = reader.ReadBoolean();
                         break;
                     default:
@@ -291,6 +299,94 @@ namespace MessagePack.Formatters.KdGame.Net
                         break;
                     case 1:
                         ____result.playerlist = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<global::KdGame.Net.NetworkManager.stPlayerData>>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
+    public sealed class NetworkManager_stSyncKeyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stSyncKey>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stSyncKey value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(2);
+            writer.Write(value.playerid);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector2>(formatterResolver).Serialize(ref writer, value.key, options);
+        }
+
+        public global::KdGame.Net.NetworkManager.stSyncKey Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::KdGame.Net.NetworkManager.stSyncKey();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.playerid = reader.ReadInt32();
+                        break;
+                    case 1:
+                        ____result.key = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector2>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
+    public sealed class NetworkManager_stSyncPosFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::KdGame.Net.NetworkManager.stSyncPos>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::KdGame.Net.NetworkManager.stSyncPos value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(2);
+            writer.Write(value.playerid);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.pos, options);
+        }
+
+        public global::KdGame.Net.NetworkManager.stSyncPos Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::KdGame.Net.NetworkManager.stSyncPos();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.playerid = reader.ReadInt32();
+                        break;
+                    case 1:
+                        ____result.pos = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     default:
                         reader.Skip();

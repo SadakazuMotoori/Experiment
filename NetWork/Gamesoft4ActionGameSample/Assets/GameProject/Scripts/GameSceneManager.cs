@@ -65,7 +65,7 @@ public class GameSceneManager : MonoBehaviour
             {
                 NetworkManager.stCreateCharacterParameter _createCharParam = new NetworkManager.stCreateCharacterParameter();
                 _createCharParam.pos        = new Vector3(Random.Range(-2, 2), 0, Random.Range(-2, 2));
-                _createCharParam.name       = NetworkManager.Instance.GetMyName(i);
+                _createCharParam.name       = NetworkManager.Instance.GetPlayerName(i);
                 _createCharParam.teamid     = 0;
                 _createCharParam.hp         = 100;
                 _createCharParam.playerid   = i;
@@ -93,7 +93,7 @@ public class GameSceneManager : MonoBehaviour
         GameObject newObj = Instantiate(asset);
         */
 
-        var handle = Addressables.InstantiateAsync("UnityChan", position: aCreateCharParam.pos, rotation: Quaternion.identity, parent: transform);
+        var handle = Addressables.InstantiateAsync("UnityChanDotNet", position: aCreateCharParam.pos, rotation: Quaternion.identity, parent: transform);
 
 //      GameObject newObj = handle.WaitForCompletion();
         GameObject newObj = await handle.Task;

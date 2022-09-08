@@ -58,13 +58,11 @@ namespace KdGame.Net
 
         void Start()
         {
-            int a = 0;
         }
 
         // Update is called once per frame
         void Update()
         {
-        //    Debug.Log("IsConnectedAndReady() = "+ IsConnectedAndReady());
             if (!IsConnectedAndReady() || m_NetworkCmdList.Count == 0) return;
 
             stReceiveData _data = m_NetworkCmdList.Dequeue();
@@ -173,7 +171,7 @@ namespace KdGame.Net
             return m_MyID;
         }
 
-        public string GetMyName(int aIndex)
+        public string GetPlayerName(int aIndex)
         {
             if (m_MyID >= m_PlayerInfo.playerlist.Count) return "";
 
@@ -259,8 +257,8 @@ namespace KdGame.Net
             // プレイヤーデータを作成する
             stPlayerData _playerData    = new stPlayerData();
             _playerData.playername      = PhotonNetwork.LocalPlayer.NickName;
-            _playerData.playerid        = PhotonNetwork.CountOfPlayers;
-            m_MyID                      = _playerData.playerid - 1;
+            _playerData.playerid        = PhotonNetwork.CountOfPlayers - 1;
+            m_MyID                      = _playerData.playerid;
 
             // マスターならユーザーデータを追加する
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
@@ -279,7 +277,7 @@ namespace KdGame.Net
             if (!PhotonNetwork.LocalPlayer.IsMasterClient) return;
             stPlayerData _playerData    = new stPlayerData();
             _playerData.playername      = newPlayer.NickName;
-            _playerData.playerid        = PhotonNetwork.CountOfPlayers - 1;
+            _playerData.playerid        = m_PlayerInfo.playerlist.Count;
 
             m_PlayerInfo.playerlist.Add(_playerData);
 

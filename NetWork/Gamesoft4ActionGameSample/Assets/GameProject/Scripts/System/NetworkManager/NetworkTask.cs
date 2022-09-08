@@ -51,10 +51,11 @@ namespace KdGame.Net
                 }
                 break;
 
-                case ENETWORK_COMMAND.CMD_CHARACTERUPDATE:
+                case ENETWORK_COMMAND.CMD_CHARACTEMOVE:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<stNetworkParameter>(aData.data);
-                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).OnNetworkUpdate(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
+                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).SetMove(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
+                //  OnNetworkUpdate(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
                 }
                 break;
 
@@ -62,6 +63,20 @@ namespace KdGame.Net
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<string>(aData.data);
                     Debug.Log("なんか入力したね！？ = " + _deserialized);
+                }
+                break;
+
+                case ENETWORK_COMMAND.CMD_SYNCPOS:
+                {
+                    var _deserialized = MessagePackSerializer.Deserialize<stSyncPos>(aData.data);
+                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).SetSyncPos(_deserialized.pos);
+                }
+                break;
+
+                case ENETWORK_COMMAND.CMD_SYNCKEY:
+                {
+                    var _deserialized = MessagePackSerializer.Deserialize<stSyncKey>(aData.data);
+                    GameSceneManager.Instance.GetCharacterBrain(_deserialized.playerid).SetSyncKey(_deserialized.key);
                 }
                 break;
             }

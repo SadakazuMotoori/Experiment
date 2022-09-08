@@ -81,6 +81,8 @@ namespace Character
 
             _inputProvider = GetComponentInChildren<InputProvider>();
             Debug.Assert(_inputProvider != null, "InputProviderがセットされてない！");
+
+            _inputProvider.SetPlayerID(_mainObjParam._playerID);
             //        _input = GetComponent<PlayerInput>();
 
             // これをしていないと、gameObjectを有効/無効にしたときにステートマシンがリセットされていろいろまずい
@@ -105,6 +107,7 @@ namespace Character
             //        Destroy(gameObject, 3);
         }
 
+        private float timeElapsed;
         // Update is called once per frame
         void Update()
         {
@@ -134,6 +137,27 @@ namespace Character
             else
             {
                 _stateMgr.Animator.speed = 0.0f;
+            }
+
+            // 一定間隔同期
+            if (_mainObjParam._playerID == NetworkManager.Instance.GetMyID())
+            {
+                timeElapsed += Time.deltaTime;
+                if (timeElapsed >= 0.008f)
+                {
+/*
+                    _brain.NetParam.axis = axis;
+                    _brain.NetParam.playerid = NetworkManager.Instance.GetMyID();
+                    _brain.NetParam.isgrounded = _brain._charaCtrl.isGrounded;
+                    _brain.NetParam.isdied = _brain._mainObjParam.IsDied;
+*/
+                    NetworkManager.stSyncPos syncPosInfo = new NetworkManager.stSyncPos();
+                    syncPosInfo.playerid = NetworkManager.Instance.GetMyID();
+                    syncPosInfo.pos = gameObject.transform.position;
+                    NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCPOS, RpcTarget.Others, syncPosInfo);
+
+                    timeElapsed = 0.0f;
+                }
             }
         }
 
@@ -212,11 +236,23 @@ namespace Character
             _velocity.z += forward.z * Time.deltaTime;
 
         }
+        public void SetSyncPos(Vector3 pos)
+        {
+            gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, pos, Time.deltaTime);
+        }
 
+        public void SetSyncKey(Vector2 key)
+        {
+            _inputProvider.SetAxisL(key);
+        }
+
+        public void SetMove(Vector2 aAxis, bool aGetButtonAttack, bool aIsGrounded, bool aIsDied)
+        {
+            _stateMgr.Animator.SetBool("IsMoving", true);
+            OnNetworkUpdate(aAxis, aGetButtonAttack, aIsGrounded, aIsDied);
+        }
         public void OnNetworkUpdate(Vector2 aAxis, bool aGetButtonAttack, bool aIsGrounded, bool aIsDied)
         {
-            if (_mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
-
             Vector2 axis = aAxis;
 
             if (axis.magnitude < 0.01f)
@@ -348,6 +384,7 @@ namespace Character
                 {
                     Animator.SetFloat("MoveSpeed", 0);
                     Animator.SetBool("IsMoving", true);
+
                     return;
                 }
 
@@ -403,16 +440,7 @@ namespace Character
 
             public override void OnUpdate()
             {
-                if (_brain._mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
-
-                Vector2 axis                = _brain._inputProvider.GetAxisL();
-                _brain.NetParam.playerid    = NetworkManager.Instance.GetMyID();
-                _brain.NetParam.axis        = axis;
-                _brain.NetParam.isgrounded  = _brain._charaCtrl.isGrounded;
-                _brain.NetParam.isdied      = _brain._mainObjParam.IsDied;
-                NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_CHARACTERUPDATE, RpcTarget.Others, _brain.NetParam);
-
-                if (axis.magnitude < 0.01f)
+                if (_brain._inputProvider.GetAxisL().magnitude < 0.01f)
                 {
                     Animator.SetBool("IsMoving", false);
                     return;
@@ -435,7 +463,7 @@ namespace Character
                 // 移動
                 if (_brain._charaCtrl.isGrounded)
                 {
-                    _brain.Walk(axis, true);
+                    _brain.Walk(_brain._inputProvider.GetAxisL(), true);
                 }
 
                 if (_brain._inputProvider.GetButtonAttack())
@@ -584,7 +612,7 @@ namespace Character
 
             public override void OnUpdate()
             {
-
+                if (_brain._mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
             }
         }
     }
