@@ -144,12 +144,6 @@ namespace Character
                 timeElapsed += Time.deltaTime;
                 if (timeElapsed >= 0.008f)
                 {
-/*
-                    _brain.NetParam.axis = axis;
-                    _brain.NetParam.playerid = NetworkManager.Instance.GetMyID();
-                    _brain.NetParam.isgrounded = _brain._charaCtrl.isGrounded;
-                    _brain.NetParam.isdied = _brain._mainObjParam.IsDied;
-*/
                     NetworkManager.stSyncPos syncPosInfo = new NetworkManager.stSyncPos();
                     syncPosInfo.playerid    = NetworkManager.Instance.GetMyID();
                     syncPosInfo.pos         = gameObject.transform.position;

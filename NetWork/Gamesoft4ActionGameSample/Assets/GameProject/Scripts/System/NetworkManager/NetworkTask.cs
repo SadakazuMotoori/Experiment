@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using MessagePack;
 using Photon.Pun;
 using UnityEngine;
@@ -12,11 +13,11 @@ namespace KdGame.Net
         {
             var serialized = MessagePackSerializer.Serialize(aData);
 
-            m_View.RPC(nameof(RpcSendMessage), aTarget, aCmd, serialized);
+            m_View.RPC(nameof(RpcSendMessage), aTarget, aCmd, m_MyID, serialized);
         }
 
         // 受信データ解析実行
-        private void AnalyzeNetworkData(stReceiveData aData)
+        private async UniTask AnalyzeNetworkData(stReceiveData aData)
         {
             switch (aData.cmd)
             {
@@ -37,7 +38,7 @@ namespace KdGame.Net
                     }
                     m_View.ViewID           = _deserialized.viewid;
 
-                    AppManager.Instance.ChangeScene("WaitRoomScene");
+                    await AppManager.Instance.ChangeScene("WaitRoomScene");
                 }
                 break;
 

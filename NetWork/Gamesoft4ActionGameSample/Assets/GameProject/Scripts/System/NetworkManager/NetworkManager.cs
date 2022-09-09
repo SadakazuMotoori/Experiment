@@ -26,10 +26,10 @@ namespace KdGame.Net
         }
         // ------------------------------------------------
 
-        private bool                    m_IsInitializedSystem;
-        private bool                    m_IsInitializedNetwork;
-        private ENETWORK_ERROR_CODE     m_LastError;
-        private Queue<stReceiveData>    m_NetworkCmdList;
+        private bool                        m_IsInitializedSystem;
+        private bool                        m_IsInitializedNetwork;
+        private ENETWORK_ERROR_CODE         m_LastError;
+        private List<Queue<stReceiveData>>  m_NetworkCmdList;
         // ------------------------------------------------
 
         // Start is called before the first frame update
@@ -63,10 +63,13 @@ namespace KdGame.Net
         // Update is called once per frame
         void Update()
         {
-            if (!IsConnectedAndReady() || m_NetworkCmdList.Count == 0) return;
+            for (int i = 0; i < 4; i++)
+            {
+                if (!IsConnectedAndReady() || m_NetworkCmdList[i].Count == 0) continue;
 
-            stReceiveData _data = m_NetworkCmdList.Dequeue();
-            AnalyzeNetworkData(_data);
+                stReceiveData _data = m_NetworkCmdList[i].Dequeue();
+                AnalyzeNetworkData(_data);
+            }
         }
         // ------------------------------------------------
 
@@ -134,8 +137,13 @@ namespace KdGame.Net
             if (m_IsInitializedSystem) return;
 
             m_IsInitializedSystem   = true;
-            m_NetworkCmdList        = new Queue<stReceiveData>();
-            m_NetworkCmdList.Clear();
+
+            m_NetworkCmdList        = new List<Queue<stReceiveData>>();
+            for(int i = 0; i < 4; i++)
+            {
+                Queue <stReceiveData> _queueData = new Queue<stReceiveData>();
+                m_NetworkCmdList.Add(_queueData);
+            }
 
             m_PlayerInfo            = new stPlayerInfo();
             m_PlayerInfo.playerlist = new List<stPlayerData>();
@@ -297,14 +305,14 @@ namespace KdGame.Net
         // ------------------------------------------------
 
         [PunRPC]
-        private void RpcSendMessage(ENETWORK_COMMAND aCMD , byte[] aData)
+        private void RpcSendMessage(ENETWORK_COMMAND aCMD , int aID , byte[] aData)
         {
             stReceiveData _receiveData = new stReceiveData
             {
                 cmd     = aCMD ,
                 data    = aData
             };
-            m_NetworkCmdList.Enqueue(_receiveData);
+            m_NetworkCmdList[aID].Enqueue(_receiveData);
         }
     }
 }
