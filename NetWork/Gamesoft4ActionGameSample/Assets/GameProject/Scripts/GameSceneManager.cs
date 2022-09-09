@@ -58,23 +58,20 @@ public class GameSceneManager : MonoBehaviour
     {
         _time = Time.time;
 
-        if (PhotonNetwork.IsMasterClient)
+        // プレイヤー分キャラを作成する
+        for (short i = 0; i < NetworkManager.Instance.GetMemberNum(); i++)
         {
-            // プレイヤー分キャラを作成する
-            for (short i = 0; i < NetworkManager.Instance.GetMemberNum(); i++)
-            {
-                NetworkManager.stCreateCharacterParameter _createCharParam = new NetworkManager.stCreateCharacterParameter();
+            NetworkManager.stCreateCharacterParameter _createCharParam = new NetworkManager.stCreateCharacterParameter();
 
-                string posName = "StartPos" + i;
-                Vector3 pos = GameObject.Find(posName).transform.position;
-                _createCharParam.pos        = new Vector3(pos.x, pos.y, pos.y);
-                _createCharParam.name       = NetworkManager.Instance.GetPlayerName(i);
-                _createCharParam.teamid     = i;
-                _createCharParam.hp         = 100;
-                _createCharParam.playerid   = i;
+            string posName = "StartPos" + i;
+            Vector3 pos = GameObject.Find(posName).transform.position;
+            _createCharParam.pos = new Vector3(pos.x, pos.y, pos.y);
+            _createCharParam.name = NetworkManager.Instance.GetPlayerName(i);
+            _createCharParam.teamid = i;
+            _createCharParam.hp = 100;
+            _createCharParam.playerid = i;
 
-                NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_CREATECHARACTER, RpcTarget.All, _createCharParam);
-            }
+            OnCreateCharacter(_createCharParam);
         }
     }
 
