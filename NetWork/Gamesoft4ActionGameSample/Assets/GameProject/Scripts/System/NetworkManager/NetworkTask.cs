@@ -26,6 +26,15 @@ namespace KdGame.Net
                     var _deserialized = MessagePackSerializer.Deserialize<stPlayerInfo>(aData.data);
                     m_PlayerInfo.playerlist.Clear();
                     m_PlayerInfo.playerlist = _deserialized.playerlist;
+
+                    for(int i = 0; i < m_PlayerInfo.playerlist.Count; i++)
+                    {
+                        if(PhotonNetwork.NickName.Equals(m_PlayerInfo.playerlist[i].playername))
+                        {
+                            m_MyID = i;
+                            break;
+                        }
+                    }
                     m_View.ViewID           = _deserialized.viewid;
 
                     AppManager.Instance.ChangeScene("WaitRoomScene");

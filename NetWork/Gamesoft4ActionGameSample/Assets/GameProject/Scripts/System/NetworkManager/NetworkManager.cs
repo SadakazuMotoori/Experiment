@@ -257,12 +257,13 @@ namespace KdGame.Net
             // プレイヤーデータを作成する
             stPlayerData _playerData    = new stPlayerData();
             _playerData.playername      = PhotonNetwork.LocalPlayer.NickName;
-            _playerData.playerid        = m_PlayerInfo.playerlist.Count;
-            m_MyID                      = PhotonNetwork.CountOfPlayers-1;
-
+       
             // マスターならユーザーデータを追加する
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
             {
+                _playerData.playerid    = 0;
+                m_MyID                  = 0;
+
                 m_PlayerInfo.playerlist.Add(_playerData);
 
                 AppManager.Instance.ChangeScene("WaitRoomScene");
