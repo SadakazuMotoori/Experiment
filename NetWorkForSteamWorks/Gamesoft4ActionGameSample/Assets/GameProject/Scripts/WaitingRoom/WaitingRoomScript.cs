@@ -16,9 +16,9 @@ public class WaitingRoomScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // ŽQ‰ÁŽÒˆê——
-        int _memberNum = NetworkManager.Instance.GetMemberNum();
+        NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
 
+        int _memberNum = _netMan.GetInRoomMemberNum();
         for (int i = 0; i < _memberNum; i++)
         {
             foreach (Transform child in m_Canvas.transform)
@@ -29,11 +29,11 @@ public class WaitingRoomScript : MonoBehaviour
                     _text = child.GetComponent<TMP_Text>();
 
                     string _nowText = _text.text;
-                    _nowText += NetworkManager.Instance.GetMemberName(i) + "\n";
+                    _nowText += NetworkManager.Instance.GetMemberNameByIndex(i) + "\n";
                     _text.text = _nowText;
                 }
 
-                if (!PhotonNetwork.LocalPlayer.IsMasterClient)
+                if (!_netMan.IsMasterClient())
                 {
                     if (child.name == "Button")
                     {
@@ -48,13 +48,24 @@ public class WaitingRoomScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        long _count = NetworkManager.Instance.GetVersatileCount();
-        if (_count == 0)
-        {
-            // ŽQ‰ÁŽÒˆê——
-            int _memberNum = NetworkManager.Instance.GetMemberNum();
+        NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
+        int _memberNum = _netMan.GetInRoomMemberNum();
 
-            if (m_NowMemberCount != _memberNum)
+        if (m_NowMemberCount != _memberNum)
+        {
+            foreach (Transform child in m_Canvas.transform)
+            {
+                if (child.name == "Member")
+                {
+                    TMP_Text _text;
+                    _text = child.GetComponent<TMP_Text>();
+                    _text.text = "";
+
+                    break;
+                }
+            }
+
+            for (int i = 0; i < _memberNum; i++)
             {
                 foreach (Transform child in m_Canvas.transform)
                 {
@@ -62,53 +73,78 @@ public class WaitingRoomScript : MonoBehaviour
                     {
                         TMP_Text _text;
                         _text = child.GetComponent<TMP_Text>();
-                        _text.text = "";
 
-                        break;
+                        string _nowText = _text.text;
+                        _nowText += NetworkManager.Instance.GetMemberNameByIndex(i) + "\n";
+                        _text.text = _nowText;
                     }
                 }
-
-                for (int i = 0; i < _memberNum; i++)
+            }
+            m_NowMemberCount = _memberNum;
+        }
+        /*
+                long _count = NetworkManager.Instance.GetVersatileCount();
+                if (_count == 0)
                 {
-                    foreach (Transform child in m_Canvas.transform)
-                    {
-                        if (child.name == "Member")
-                        {
-                            TMP_Text _text;
-                            _text = child.GetComponent<TMP_Text>();
+                    // ŽQ‰ÁŽÒˆê——
+                    int _memberNum = NetworkManager.Instance.GetMemberNum();
 
-                            string _nowText = _text.text;
-                            _nowText += NetworkManager.Instance.GetMemberName(i) + "\n";
-                            _text.text = _nowText;
+                    if (m_NowMemberCount != _memberNum)
+                    {
+                        foreach (Transform child in m_Canvas.transform)
+                        {
+                            if (child.name == "Member")
+                            {
+                                TMP_Text _text;
+                                _text = child.GetComponent<TMP_Text>();
+                                _text.text = "";
+
+                                break;
+                            }
+                        }
+
+                        for (int i = 0; i < _memberNum; i++)
+                        {
+                            foreach (Transform child in m_Canvas.transform)
+                            {
+                                if (child.name == "Member")
+                                {
+                                    TMP_Text _text;
+                                    _text = child.GetComponent<TMP_Text>();
+
+                                    string _nowText = _text.text;
+                                    _nowText += NetworkManager.Instance.GetMemberName(i) + "\n";
+                                    _text.text = _nowText;
+                                }
+                            }
+                        }
+                        m_NowMemberCount = _memberNum;
+                    }
+                }
+                else
+                {
+                    long time = (_count - (long)(DateTime.Now - UnixEpoch).TotalSeconds);
+
+                    if (time < 0)
+                    {
+                        NetworkManager.Instance.ResetVersatileCount();
+                        Destroy(this);
+                        AppManager.Instance.ChangeScene("GameScene");
+                    }
+                    else
+                    {
+                        foreach (Transform child in m_Canvas.transform)
+                        {
+                            if (child.name == "Time")
+                            {
+                                TMP_Text _text;
+                                _text = child.GetComponent<TMP_Text>();
+                                _text.text = time.ToString();
+                            }
                         }
                     }
                 }
-                m_NowMemberCount = _memberNum;
-            }
-        }
-        else
-        {
-            long time = (_count - (long)(DateTime.Now - UnixEpoch).TotalSeconds);
-
-            if (time < 0)
-            {
-                NetworkManager.Instance.ResetVersatileCount();
-                Destroy(this);
-                AppManager.Instance.ChangeScene("GameScene");
-            }
-            else
-            {
-                foreach (Transform child in m_Canvas.transform)
-                {
-                    if (child.name == "Time")
-                    {
-                        TMP_Text _text;
-                        _text = child.GetComponent<TMP_Text>();
-                        _text.text = time.ToString();
-                    }
-                }
-            }
-        }
+        */
     }
 
     public void OnClickGoGame()
@@ -125,6 +161,6 @@ public class WaitingRoomScript : MonoBehaviour
         }
 
         long _startTime = (long)(DateTime.Now - UnixEpoch).TotalSeconds + 10;
-        NetworkManager.Instance.GameStartNotification(_startTime);
+//        NetworkManager.Instance.GameStartNotification(_startTime);
     }
 }

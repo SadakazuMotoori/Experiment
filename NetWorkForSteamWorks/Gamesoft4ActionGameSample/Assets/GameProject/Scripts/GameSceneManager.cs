@@ -59,6 +59,7 @@ public class GameSceneManager : MonoBehaviour
         _time = Time.time;
 
         // プレイヤー分キャラを作成する
+/*
         for (short i = 0; i < NetworkManager.Instance.GetMemberNum(); i++)
         {
             NetworkManager.stCreateCharacterParameter _createCharParam = new NetworkManager.stCreateCharacterParameter();
@@ -73,6 +74,7 @@ public class GameSceneManager : MonoBehaviour
 
             OnCreateCharacter(_createCharParam);
         }
+*/
     }
 
     // Update is called once per frame

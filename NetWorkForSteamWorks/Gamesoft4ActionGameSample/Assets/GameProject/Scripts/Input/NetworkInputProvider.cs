@@ -47,6 +47,7 @@ public class NetworkInputProvider : InputProvider
 
     private void Update()
     {
+/*
         if (m_PlayerID == NetworkManager.Instance.GetMyID())
         {
             if (PlayerInputManager.Instance.GamePlay_GetButtonMenu())
@@ -76,6 +77,7 @@ public class NetworkInputProvider : InputProvider
                 NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCATTACK, RpcTarget.All, syncAttackInfo);
             }
         }
+*/
     }
 
     async UniTask OpenMenuWindow()

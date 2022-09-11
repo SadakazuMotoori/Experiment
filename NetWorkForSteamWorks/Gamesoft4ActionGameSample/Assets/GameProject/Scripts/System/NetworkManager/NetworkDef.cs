@@ -8,61 +8,100 @@ namespace KdGame.Net
 {
     public partial class NetworkManager : MonoBehaviourPunCallbacks
     {
+        // ネットワーク系応答タイムアウト時間(ms)
+        private const int NETWORK_TIME_OUT_WAIT = 10000;
+        // 1ROOM辺りのプレイヤー数
+        private const int INROOM_PLAYER_MAX     = 4;
+
         // ネットワークエラー定義
         public enum ENETWORK_ERROR_CODE
         {
-            ERR_NORE,                                   // エラー無し
+            NET_ERR_NORE,                                       // エラー無し
 
-            ERR_CONNECT,                                // Photonサーバーへのコネクトエラー
-            ERR_CREATEROOM,                             // ROOM作成エラー
+            NET_ERR_INITIALIZE,                                 // 初期化失敗
+            NET_ERR_INITIALIZE_ALREADY,                         // 初期化済み
 
-            ERR_JOINLOBBY,                              // ロビー参加エラー
-            ERR_JOINROOM,                               // ROOM参加エラー
+            NET_ERR_CREATEROOM,                                 // ROOM作成エラー
 
-            ERR_TIMEOUT,                                // ネットワークタイムアウト
+            NET_ERR_JOINLOBBY,                                  // ロビー参加エラー
+            NET_ERR_JOINROOM,                                   // ROOM参加エラー
+
+            NET_ERR_TIMEOUT,                                    // ネットワークタイムアウト
         }
-        // ------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
 
         // 受信コマンド解析定義
         public enum ENETWORK_COMMAND
         {
-            CMD_UPDATEPLAYER_LIST,                      // プレイヤーリスト更新通知
+            CMD_UPDATEPLAYER_LIST,                              // プレイヤーリスト更新通知
 
-            CMD_GAMESTARTCOUNTDOWN,                     // ゲームスタートカウントダウン
-            CMD_CREATECHARACTER,                        // キャラクター生成
-            CMD_CHARACTERUPDATE,                        // キャラクター同期
-            CMD_CHARACTEMOVE,                           // キャラクター移動
+            CMD_GAMESTARTCOUNTDOWN,                             // ゲームスタートカウントダウン
+            CMD_CREATECHARACTER,                                // キャラクター生成
+            CMD_CHARACTERUPDATE,                                // キャラクター同期
+            CMD_CHARACTEMOVE,                                   // キャラクター移動
 
-            CMD_SYNCPOS,                                // 位置同期
-            CMD_SYNCKEY,                                // キー同期
-            CMD_SYNCATTACK,                             // 攻撃同期
-            CMD_SYNCDEAD,                               // 戦闘不能同期
-            CMD_INPUT,                                  // キー入力通知
+            CMD_SYNCPOS,                                        // 位置同期
+            CMD_SYNCKEY,                                        // キー同期
+            CMD_SYNCATTACK,                                     // 攻撃同期
+            CMD_SYNCDEAD,                                       // 戦闘不能同期
         }
-        // ------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
+
+        // 受信データ
+        private struct stReceiveData
+        {
+            public ENETWORK_COMMAND     cmd     { get; set; }   // ネットワーク経由で実行されるコマンド
+            public byte[]               data    { get; set; }   // 実行時利用するデータ
+        }
+        // ------------------------------------------------------------------------------------------------
+
+        // ネットワーク用ルーム内情報
         [MessagePackObject]
         [Serializable]
-        public struct stPlayerData
+        public struct stNetData
         {
             [Key(0)]
-            public string   playername                  { get; set; }
-
+            public string name  { get; set; }   // ルーム内プレイヤー名
             [Key(1)]
-            public int      playerid                    { get; set; }
+            public int id       { get; set; }   // ルーム内プレイヤー識別ID
+
+            public stNetData(int aID = -1, string aName = "No Name")
+            {
+                name    = aName;
+                id      = aID;
+            }
         }
-        // ------------------------------------------------
 
         [MessagePackObject]
         [Serializable]
-        public struct stPlayerInfo
+        public struct stNetInfo
         {
             [Key(0)]
-            public int                  viewid          { get; set; }
-
-            [Key(1)]
-            public List<stPlayerData>   playerlist      { get; set; }
+            public List<stNetData> infolist { get; set; }
         }
+    /*
+            [MessagePackObject]
+            [Serializable]
+            public struct stPlayerData
+            {
+                [Key(0)]
+                public string   playername                  { get; set; }
 
+                [Key(1)]
+                public int      playerid                    { get; set; }
+            }
+
+            [MessagePackObject]
+            [Serializable]
+            public struct stPlayerInfo
+            {
+                [Key(0)]
+                public int                  viewid          { get; set; }
+
+                [Key(1)]
+                public List<stPlayerData>   playerlist      { get; set; }
+            }
+    */
         [MessagePackObject]
         [Serializable]
         public struct stCreateCharacterParameter

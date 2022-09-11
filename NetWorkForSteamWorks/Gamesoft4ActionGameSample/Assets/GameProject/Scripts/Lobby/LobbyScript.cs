@@ -9,56 +9,107 @@ public class LobbyScript : MonoBehaviour
     public Canvas m_Canvas;
     TMP_InputField m_InputField;
 
+    void Awake()
+    {
+        NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
+        if (_netMan)
+        {
+            _netMan.InitializeManagerSystem();
+        }
+
+        m_InputField = GameObject.Find("InputField (TMP)").GetComponent<TMP_InputField>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
         if(_netMan)
         {
-            AppManager.Instance.GetNetworkManager().InitializeNetworkManager();
+            _netMan.InitializeNetWorkSystem();
         }
-
-        m_InputField = GameObject.Find("InputField (TMP)").GetComponent<TMP_InputField>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
 
+        if(!_netMan.IsNetworkSystemReady())
+        {
+            Debug.Log("ネットワークシステムが未初期化です！");
+            return;
+        }
     }
 
     public void OnChangePlayerName()
     {
-        NetworkManager.Instance.SetPlayerName(m_InputField.text);
+        NetworkManager.Instance.SetMyPlayerName(m_InputField.text);
     }
 
-    public void OnClickCreateRoom()
+    public async void OnClickCreateRoom()
     {
-        Debug.Log("CreateRoom押された!");  // ログを出力
+        Debug.Log("CreateRoom押された!");
 
         foreach (Transform child in m_Canvas.transform)
         {
             if (child.name == "Button01" || child.name == "Button02")
             {
-                Destroy(child.gameObject);
+                child.gameObject.SetActive(false);
             }
         }
 
-        NetworkManager.Instance.InitializeNetworkStatus("TestRoom");
+        NetworkManager.ENETWORK_ERROR_CODE _err;
+        _err = await NetworkManager.Instance.CreateRoom("TestRoom");
+
+        if(_err == NetworkManager.ENETWORK_ERROR_CODE.NET_ERR_NORE)
+        {
+            Debug.Log("ルーム作成成功！");
+            await AppManager.Instance.ChangeScene("WaitRoomScene");
+        }
+        else
+        {
+            Debug.Log("ルーム作成失敗！");
+            foreach (Transform child in m_Canvas.transform)
+            {
+                if (child.name == "Button01" || child.name == "Button02")
+                {
+                    child.gameObject.SetActive(true);
+                }
+            }
+        }
     }
 
-    public void OnClickJoinRoom()
+    public async void OnClickJoinRoom()
     {
-        Debug.Log("JoinRoom押された!");  // ログを出力
+        Debug.Log("JoinRoom押された!");
 
         foreach (Transform child in m_Canvas.transform)
         {
             if (child.name == "Button01" || child.name == "Button02")
             {
-                Destroy(child.gameObject);
+                child.gameObject.SetActive(false);
             }
         }
 
-        NetworkManager.Instance.InitializeNetworkStatus("TestRoom");
+        NetworkManager.ENETWORK_ERROR_CODE _err;
+        _err = await NetworkManager.Instance.JoinRoom("TestRoom");
+
+        if (_err == NetworkManager.ENETWORK_ERROR_CODE.NET_ERR_NORE)
+        {
+            Debug.Log("ルーム作成成功！");
+            await AppManager.Instance.ChangeScene("WaitRoomScene");
+        }
+        else
+        {
+            Debug.Log("ルーム作成失敗！");
+            foreach (Transform child in m_Canvas.transform)
+            {
+                if (child.name == "Button01" || child.name == "Button02")
+                {
+                    child.gameObject.SetActive(true);
+                }
+            }
+        }
     }
 }

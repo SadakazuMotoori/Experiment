@@ -139,6 +139,7 @@ namespace Character
             }
 
             // ˆê’èŠÔŠu“¯Šú
+/*
             if (_mainObjParam._playerID == NetworkManager.Instance.GetMyID())
             {
                 timeElapsed += Time.deltaTime;
@@ -153,6 +154,7 @@ namespace Character
                     timeElapsed = 0.0f;
                 }
             }
+*/
         }
 
         void FixedUpdate()
@@ -319,6 +321,7 @@ namespace Character
             if (_mainObjParam.IsInvincible) return false;
 
             // 
+/*
             if (_mainObjParam._playerID == NetworkManager.Instance.GetMyID())
             {
                 _mainObjParam.Hp -= param.DamageValue;
@@ -335,7 +338,7 @@ namespace Character
                 _stateMgr.Animator.SetTrigger("DoStagger");
 
             }
-
+*/
             // 
             _velocity += param.Blow;
 
@@ -628,7 +631,6 @@ namespace Character
 
             public override void OnUpdate()
             {
-                if (_brain._mainObjParam._playerID != NetworkManager.Instance.GetMyID()) return;
             }
         }
     }

@@ -1,8 +1,15 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using MessagePack;
-using Photon.Pun;
 using UnityEngine;
+
+using MessagePack;
+
+#if USE_STEAMWORKS
+using Steamworks;
+#else
+using Photon.Pun;
+using Photon.Realtime;
+#endif
 
 namespace KdGame.Net
 {
@@ -13,32 +20,37 @@ namespace KdGame.Net
         {
             var serialized = MessagePackSerializer.Serialize(aData);
 
-            m_View.RPC(nameof(RpcSendMessage), aTarget, aCmd, m_MyID, serialized);
+            m_View.RPC(nameof(RpcSendMessage), aTarget, aCmd, m_RoomID, serialized);
         }
 
         // 受信データ解析実行
         private async UniTask AnalyzeNetworkData(stReceiveData aData)
         {
+            await NetworkWait();
+
             switch (aData.cmd)
             {
                 // クライアント限定
                 case ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST:
                 {
-                    var _deserialized = MessagePackSerializer.Deserialize<stPlayerInfo>(aData.data);
-                    m_PlayerInfo.playerlist.Clear();
-                    m_PlayerInfo.playerlist = _deserialized.playerlist;
+                    var _deserialized   = MessagePackSerializer.Deserialize<stNetInfo>(aData.data);
 
-                    for(int i = 0; i < m_PlayerInfo.playerlist.Count; i++)
+                    m_NetInfo.infolist.Clear();
+                    m_NetInfo.infolist  = _deserialized.infolist;
+
+                    for(int i = 0; i < m_NetInfo.infolist.Count; i++)
                     {
-                        if(PhotonNetwork.NickName.Equals(m_PlayerInfo.playerlist[i].playername))
+                        if (GetMyPlayerName().Equals(m_NetInfo.infolist[i].name))
                         {
-                            m_MyID = i;
+                            m_RoomID = i;
                             break;
                         }
                     }
-                    m_View.ViewID           = _deserialized.viewid;
-
-                    await AppManager.Instance.ChangeScene("WaitRoomScene");
+#if USE_STEAMWORKS
+using Steamworks;
+#else
+                    m_View.ViewID = 1001;
+#endif
                 }
                 break;
 
@@ -46,7 +58,7 @@ namespace KdGame.Net
                 case ENETWORK_COMMAND.CMD_GAMESTARTCOUNTDOWN:
                 {
                     var _deserialized = MessagePackSerializer.Deserialize<long>(aData.data);
-                    SetVersatileCount(_deserialized);
+ //                 SetVersatileCount(_deserialized);
                 }
                 break;
 
@@ -67,13 +79,6 @@ namespace KdGame.Net
                         _brain.SetMove(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
                     }
                 //  OnNetworkUpdate(_deserialized.axis, _deserialized.attack, _deserialized.isgrounded, _deserialized.isdied);
-                }
-                break;
-
-                case ENETWORK_COMMAND.CMD_INPUT:
-                {
-                    var _deserialized = MessagePackSerializer.Deserialize<string>(aData.data);
-                    Debug.Log("なんか入力したね！？ = " + _deserialized);
                 }
                 break;
 
