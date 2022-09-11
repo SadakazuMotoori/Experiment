@@ -35,7 +35,7 @@ namespace KdGame.Net
         {
             CMD_UPDATEPLAYER_LIST,                              // プレイヤーリスト更新通知
 
-            CMD_GAMESTARTCOUNTDOWN,                             // ゲームスタートカウントダウン
+            CMD_COUNTDOWN,                                      // カウントダウン同期
             CMD_CREATECHARACTER,                                // キャラクター生成
             CMD_CHARACTERUPDATE,                                // キャラクター同期
             CMD_CHARACTEMOVE,                                   // キャラクター移動

@@ -47,8 +47,9 @@ public class NetworkInputProvider : InputProvider
 
     private void Update()
     {
-/*
-        if (m_PlayerID == NetworkManager.Instance.GetMyID())
+        NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
+
+        if (m_PlayerID == _netMan.GetMyRoomID())
         {
             if (PlayerInputManager.Instance.GamePlay_GetButtonMenu())
             {
@@ -60,7 +61,7 @@ public class NetworkInputProvider : InputProvider
                 m_Key = PlayerInputManager.Instance.GamePlay_GetAxisL();
 
                 NetworkManager.stSyncKey syncKeyInfo = new NetworkManager.stSyncKey();
-                syncKeyInfo.playerid    = NetworkManager.Instance.GetMyID();
+                syncKeyInfo.playerid    = _netMan.GetMyRoomID();
                 syncKeyInfo.key         = m_Key;
                 NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCKEY, RpcTarget.All, syncKeyInfo);
             }
@@ -71,13 +72,12 @@ public class NetworkInputProvider : InputProvider
                 m_Attack = PlayerInputManager.Instance.GamePlay_GetButtonAttack();
 
                 NetworkManager.stSyncAttack syncAttackInfo = new NetworkManager.stSyncAttack();
-                syncAttackInfo.playerid     = NetworkManager.Instance.GetMyID();
+                syncAttackInfo.playerid     = _netMan.GetMyRoomID();
                 syncAttackInfo.attack       = m_Attack;
                 m_PrevAttack                = m_Attack;
                 NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCATTACK, RpcTarget.All, syncAttackInfo);
             }
         }
-*/
     }
 
     async UniTask OpenMenuWindow()

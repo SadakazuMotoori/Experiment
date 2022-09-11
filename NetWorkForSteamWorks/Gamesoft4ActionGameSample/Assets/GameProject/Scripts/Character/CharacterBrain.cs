@@ -139,22 +139,21 @@ namespace Character
             }
 
             // ˆê’èŠÔŠu“¯Šú
-/*
-            if (_mainObjParam._playerID == NetworkManager.Instance.GetMyID())
+            NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
+            if (_mainObjParam._playerID == _netMan.GetMyRoomID())
             {
                 timeElapsed += Time.deltaTime;
                 if (timeElapsed >= 0.008f)
                 {
-                    NetworkManager.stSyncPos syncPosInfo = new NetworkManager.stSyncPos();
-                    syncPosInfo.playerid    = NetworkManager.Instance.GetMyID();
-                    syncPosInfo.pos         = gameObject.transform.position;
-                    syncPosInfo.hp          = _mainObjParam.Hp;
-                    NetworkManager.Instance.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCPOS, RpcTarget.Others, syncPosInfo);
+                    NetworkManager.stSyncPos syncPosInfo    = new NetworkManager.stSyncPos();
+                    syncPosInfo.playerid                    = _netMan.GetMyRoomID();
+                    syncPosInfo.pos                         = gameObject.transform.position;
+                    syncPosInfo.hp                          = _mainObjParam.Hp;
+                    _netMan.CreateSendData(NetworkManager.ENETWORK_COMMAND.CMD_SYNCPOS, RpcTarget.Others, syncPosInfo);
 
                     timeElapsed = 0.0f;
                 }
             }
-*/
         }
 
         void FixedUpdate()

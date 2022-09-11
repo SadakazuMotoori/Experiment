@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 using MessagePack;
 
@@ -55,10 +54,13 @@ using Steamworks;
                 break;
 
                 // 全員対象
-                case ENETWORK_COMMAND.CMD_GAMESTARTCOUNTDOWN:
+                case ENETWORK_COMMAND.CMD_COUNTDOWN:
                 {
-                    var _deserialized = MessagePackSerializer.Deserialize<long>(aData.data);
- //                 SetVersatileCount(_deserialized);
+                    var _deserialized   = MessagePackSerializer.Deserialize<int>(aData.data);
+
+                    DateTime _unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                    long _startTime     = (long)(DateTime.Now - _unixEpoch).TotalSeconds + 10;
+                    SetVersatileCount(_startTime);
                 }
                 break;
 

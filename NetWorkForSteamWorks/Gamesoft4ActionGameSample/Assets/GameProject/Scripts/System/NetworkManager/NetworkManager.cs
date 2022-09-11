@@ -27,6 +27,9 @@ namespace KdGame.Net
         private stNetInfo                   m_NetInfo;
         // ----------------------------------------------------------------
 
+        private long                        m_VersatileCount;
+        // ----------------------------------------------------------------
+
 #if USE_STEAMWORKS
 #else
         private PhotonView                  m_View;
@@ -140,7 +143,10 @@ namespace KdGame.Net
                 m_NetInfo.infolist.Add(new stNetData(m_RoomID, "No Name"));
                 m_NetworkCmdList.Add(new Queue<stReceiveData>());
             }
-        
+
+            // その他汎用系メンバ初期化
+            ResetVersatileCount();
+
             m_LastError                     = ENETWORK_ERROR_CODE.NET_ERR_NORE;
             m_IsInitializedManagerSystem    = true;
         }
@@ -194,7 +200,7 @@ namespace KdGame.Net
         /// <returns></returns>
         public bool IsMasterClient()
         {
-            if (IsNetworkSystemReady()) return false;
+            if (!IsNetworkSystemReady()) return false;
 
 #if USE_STEAMWORKS
             return false;
@@ -230,6 +236,19 @@ namespace KdGame.Net
             SteamFriends.SetPersonaName(aPlayerName);
 #else
             PhotonNetwork.NickName  = aPlayerName;
+#endif
+        }
+
+        /// <summary>
+        /// 自身のルーム内IDを取得する
+        /// </summary>
+        /// <returns>自身のルーム内ID</returns>
+        public int GetMyRoomID()
+        {
+#if USE_STEAM_WORKS
+            return -1;
+#else
+            return m_RoomID;
 #endif
         }
 
@@ -318,6 +337,40 @@ namespace KdGame.Net
             return m_NetInfo.infolist[aIndex].name;
         }
 
+        /// <summary>
+        /// カウントダウンスタート通知
+        /// </summary>
+        /// <param name="aStartTime"></param>
+        public void CountStartNotification(int aStartTime)
+        {
+            CreateSendData(ENETWORK_COMMAND.CMD_COUNTDOWN, RpcTarget.All, aStartTime);
+        }
+
+        /// <summary>
+        /// カウントスタート時間設定
+        /// </summary>
+        /// <param name="aVersatileCount"></param>
+        public void SetVersatileCount(long aVersatileCount)
+        {
+            m_VersatileCount = aVersatileCount;
+        }
+
+        /// <summary>
+        /// カウント時間取得
+        /// </summary>
+        /// <returns>残りカウント値</returns>
+        public long GetVersatileCount()
+        {
+            return m_VersatileCount;
+        }
+
+        /// <summary>
+        /// カウント時間初期化
+        /// </summary>
+        public void ResetVersatileCount()
+        {
+            m_VersatileCount = 0;
+        }
         // ----------------------------------------------------------------
 
 #if USE_STEAM_WORKS
@@ -328,7 +381,7 @@ namespace KdGame.Net
         public override void OnCreatedRoom()
         {
             // プレイヤーデータを作成する
-            if (!PhotonNetwork.IsMasterClient) return;
+            if (!IsMasterClient()) return;
 
             m_RoomID                        = 0;
             stNetData _info                 = m_NetInfo.infolist[m_RoomID];
@@ -342,7 +395,7 @@ namespace KdGame.Net
         /// </summary>
         public override void OnJoinedRoom()
         {
-            if (PhotonNetwork.IsMasterClient)  return;
+            if (IsMasterClient())  return;
         }
 
         /// <summary>
@@ -352,7 +405,7 @@ namespace KdGame.Net
         {
             base.OnPlayerEnteredRoom(newPlayer);
 
-            if (!PhotonNetwork.IsMasterClient) return;
+            if (!IsMasterClient()) return;
 
             // 入室したプレイヤー情報を作成する
             stNetData _newPlayer        = new stNetData();
@@ -386,149 +439,6 @@ namespace KdGame.Net
             m_LastError = ENETWORK_ERROR_CODE.NET_ERR_JOINROOM;
         }
 #endif
-        /*
-                public List<stPlayerData> GetPlayerList()
-                {
-                    return m_PlayerInfo.playerlist;
-                }
-
-                public int GetMemberNum()
-                {
-                    return m_PlayerInfo.playerlist.Count;
-                }
-
-                public string GetMemberName(int index = 0)
-                {
-                    if (index >= m_PlayerInfo.playerlist.Count) return "";
-
-                    return m_PlayerInfo.playerlist[index].playername;
-                }
-
-                public string GetMyName()
-                {
-                    if (m_MyID >= m_PlayerInfo.playerlist.Count) return "";
-
-                    return m_PlayerInfo.playerlist[m_MyID].playername;
-                }
-
-                public int GetMyID()
-                {
-                    return m_MyID;
-                }
-
-                public ENETWORK_ERROR_CODE GetNetworkLastError()
-                {
-                    return m_LastError;
-                }
-
-                public async UniTask InitializeNetworkStatus(string aName)
-                {
-                    if (m_IsInitializedNetwork) return;
-
-                    // ネットワーク初期化時にまずはサーバーへ接続
-                    if (!PhotonNetwork.IsConnected)
-                    {
-                        ENETWORK_ERROR_CODE _lasterr = await RequestConnect(aName);
-                        Debug.Log("last error = " + _lasterr);
-
-                        if(_lasterr != ENETWORK_ERROR_CODE.ERR_NORE) return;
-                    }
-                }
-
-                public void GameStartNotification(long aStartTime)
-                {
-                    m_VersatileCount = 0;
-                    CreateSendData(ENETWORK_COMMAND.CMD_GAMESTARTCOUNTDOWN, RpcTarget.All, aStartTime);
-                }
-
-                public long GetVersatileCount()
-                {
-                    return m_VersatileCount;
-                }
-                public void SetVersatileCount(long aCount)
-                {
-                    m_VersatileCount = aCount;
-                }
-                public void ResetVersatileCount()
-                {
-                    m_VersatileCount = 0;
-                }
-
-                // ------------------------------------------------
-
-                // マスターサーバーへ接続した
-                public override void OnConnectedToMaster()
-                {
-                    Debug.Log("connected to master!");
-
-                    m_IsInitializedNetwork = true;
-                }
-
-                // ロビーに入室した
-                public override void OnJoinedLobby()
-                {
-                    Debug.Log("joined lobby!!!");
-                }
-
-                // ルームを作成した
-                public override void OnCreatedRoom()
-                {
-                    Debug.Log("create room!!!");
-                }
-
-                // ルームに入室した
-                public override void OnJoinedRoom()
-                {
-                    Debug.Log("joined room!!!");
-
-                    // 通信用ネットワークオブジェクトを作成
-                    m_View = this.gameObject.AddComponent<PhotonView>();
-                    m_View.Synchronization  = ViewSynchronization.Off;
-                    //PhotonNetwork.AllocateViewID(m_View);
-                    m_View.ViewID           = 1001;
-
-                    // プレイヤーデータを作成する
-                    stPlayerData _playerData    = new stPlayerData();
-                    _playerData.playername      = PhotonNetwork.LocalPlayer.NickName;
-
-                    // マスターならユーザーデータを追加する
-                    if (PhotonNetwork.LocalPlayer.IsMasterClient)
-                    {
-                        _playerData.playerid    = 0;
-                        m_MyID                  = 0;
-
-                        m_PlayerInfo.playerlist.Add(_playerData);
-
-                        AppManager.Instance.ChangeScene("WaitRoomScene");
-                    }
-                }
-
-                // ルームに誰かが入室した
-                public override void OnPlayerEnteredRoom(Player newPlayer)
-                {
-                    base.OnPlayerEnteredRoom(newPlayer);
-
-                    if (!PhotonNetwork.LocalPlayer.IsMasterClient) return;
-                    stPlayerData _playerData    = new stPlayerData();
-                    _playerData.playername      = newPlayer.NickName;
-                    _playerData.playerid        = m_PlayerInfo.playerlist.Count;
-
-                    m_PlayerInfo.playerlist.Add(_playerData);
-
-                    // 更新したプレイヤーリストを送信する
-                    m_PlayerInfo.viewid         = m_View.ViewID;
-                    CreateSendData(ENETWORK_COMMAND.CMD_UPDATEPLAYER_LIST, RpcTarget.Others, m_PlayerInfo);
-                }
-
-                // 誰かがルームから退室した
-                public override void OnPlayerLeftRoom(Player otherPlayer)
-                {
-                    base.OnPlayerLeftRoom(otherPlayer);
-
-                    if (!PhotonNetwork.LocalPlayer.IsMasterClient) return;
-                }
-                // ------------------------------------------------
-        */
 
         /// <summary>
         /// 受信したネットワークコマンドをキューに入れる

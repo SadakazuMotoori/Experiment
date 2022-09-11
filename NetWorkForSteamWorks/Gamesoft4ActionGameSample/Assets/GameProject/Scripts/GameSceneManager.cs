@@ -59,22 +59,21 @@ public class GameSceneManager : MonoBehaviour
         _time = Time.time;
 
         // プレイヤー分キャラを作成する
-/*
-        for (short i = 0; i < NetworkManager.Instance.GetMemberNum(); i++)
+        NetworkManager _netMan = AppManager.Instance.GetNetworkManager();
+        for (short i = 0; i < _netMan.GetInRoomMemberNum(); i++)
         {
             NetworkManager.stCreateCharacterParameter _createCharParam = new NetworkManager.stCreateCharacterParameter();
 
             string posName = "StartPos" + i;
             Vector3 pos = GameObject.Find(posName).transform.position;
-            _createCharParam.pos = new Vector3(pos.x, pos.y, pos.y);
-            _createCharParam.name = NetworkManager.Instance.GetPlayerName(i);
-            _createCharParam.teamid = i;
-            _createCharParam.hp = 100;
-            _createCharParam.playerid = i;
+            _createCharParam.pos        = new Vector3(pos.x, pos.y, pos.y);
+            _createCharParam.name       = _netMan.GetMemberNameByIndex(i);
+            _createCharParam.teamid     = i;
+            _createCharParam.hp         = 100;
+            _createCharParam.playerid   = i;
 
             OnCreateCharacter(_createCharParam);
         }
-*/
     }
 
     // Update is called once per frame
